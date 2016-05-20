@@ -17,6 +17,6 @@ public class IndexController {
 
 	@RequestMapping(method=RequestMethod.POST, value="/", consumes="application/x-yaml")
 	public String upload(@RequestBody Declaration declaration) throws Exception {
-		return "Converged org "+declaration.getOrg().getName();
+		return "Converged org "+declaration.org.name;
 	}
 }

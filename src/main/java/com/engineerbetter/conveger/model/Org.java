@@ -1,15 +1,14 @@
 package com.engineerbetter.conveger.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Org
 {
-	private String name;
+	public final String name;
 
-	public String getName()
-	{
-		return name;
-	}
-
-	public void setName(String name)
+	@JsonCreator
+	public Org(@JsonProperty("name") String name)
 	{
 		this.name = name;
 	}
