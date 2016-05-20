@@ -5,8 +5,12 @@ import static org.junit.Assert.*;
 
 import java.net.URI;
 
+import org.cloudfoundry.operations.CloudFoundryOperations;
+import org.cloudfoundry.operations.organizations.DeleteOrganizationRequest;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
@@ -23,10 +27,17 @@ import org.springframework.web.client.RestTemplate;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(ConvergerApplication.class)
 @WebIntegrationTest(randomPort=true)
-public class UploadTest {
+public class UploadIntegrationTest {
 	@Value("${local.server.port}")
 	private int port;
 	private RestTemplate rest = new TestRestTemplate();
+	@Autowired
+	private CloudFoundryOperations cfOps;
+
+	@After
+	public void teardown() {
+		cfOps.organizations().delete(DeleteOrganizationRequest.builder().name("my-lovely-org").build()).get();
+	}
 
 	@Test
 	public void triggersConvergence() throws Exception {

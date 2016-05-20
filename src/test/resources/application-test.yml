@@ -1,0 +1,5 @@
+---
+cf:
+  host: localhost
+  username: admin
+  password: admin
