@@ -5,8 +5,10 @@ import static org.junit.Assert.*;
 
 import java.net.URI;
 
-import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,16 +34,18 @@ public class UploadIntegrationTest {
 	private int port;
 	private RestTemplate rest = new TestRestTemplate();
 	@Autowired
-	private CloudFoundryOperations cfOps;
+	private CloudFoundryClient cfClient;
 
 	@After
 	public void teardown() {
-		cfOps.organizations().delete(DeleteOrganizationRequest.builder().name("my-lovely-org").build()).get();
+		ListOrganizationsResponse response = cfClient.organizations().list(ListOrganizationsRequest.builder().name("my-lovely-org").build()).get();
+		String orgId = response.getResources().get(0).getMetadata().getId();
+		cfClient.organizations().delete(DeleteOrganizationRequest.builder().organizationId(orgId).build()).get();
 	}
 
 	@Test
 	public void triggersConvergence() throws Exception {
-		ClassPathResource fixture = new ClassPathResource("declaration.yml");
+		ClassPathResource fixture = new ClassPathResource("fixtures/declaration.yml");
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.add("Content-Type", "application/x-yaml");
 		requestHeaders.add("Accept", "application/json");

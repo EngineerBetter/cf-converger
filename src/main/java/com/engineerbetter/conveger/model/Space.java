@@ -1,20 +1,15 @@
 package com.engineerbetter.conveger.model;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Org
+public class Space
 {
 	public final String name;
-	public final List<Space> spaces;
 
 	@JsonCreator
-	public Org(@JsonProperty("name") String name, @JsonProperty("spaces") List<Space> spaces)
-	{
+	public Space(@JsonProperty("name") String name) {
 		this.name = name;
-		this.spaces = spaces;
 	}
 
 	@Override
@@ -23,7 +18,6 @@ public class Org
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((spaces == null) ? 0 : spaces.hashCode());
 		return result;
 	}
 
@@ -36,18 +30,12 @@ public class Org
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Org other = (Org) obj;
+		Space other = (Space) obj;
 		if (name == null)
 		{
 			if (other.name != null)
 				return false;
 		} else if (!name.equals(other.name))
-			return false;
-		if (spaces == null)
-		{
-			if (other.spaces != null)
-				return false;
-		} else if (!spaces.equals(other.spaces))
 			return false;
 		return true;
 	}
@@ -55,8 +43,6 @@ public class Org
 	@Override
 	public String toString()
 	{
-		return "Org [name=" + name + ", spaces=" + spaces + "]";
+		return "Space [name=" + name + "]";
 	}
-
-
 }

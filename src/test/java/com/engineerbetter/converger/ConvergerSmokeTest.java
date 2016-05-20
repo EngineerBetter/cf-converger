@@ -4,8 +4,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -48,11 +46,6 @@ public class ConvergerSmokeTest
 		CloudFoundryClient mockCfClient()
 		{
 			return Mockito.mock(CloudFoundryClient.class);
-		}
-
-		@Bean
-		CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient) {
-			return new CloudFoundryOperationsBuilder().cloudFoundryClient(cloudFoundryClient).build();
 		}
 	}
 }

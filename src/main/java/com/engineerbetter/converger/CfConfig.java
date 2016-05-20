@@ -1,8 +1,6 @@
 package com.engineerbetter.converger;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.cloudfoundry.uaa.UaaClient;
@@ -28,10 +26,5 @@ public class CfConfig
 	@Bean
 	UaaClient uaaClient(SpringCloudFoundryClient cloudFoundryClient) {
 		return ReactorUaaClient.builder().cloudFoundryClient(cloudFoundryClient).build();
-	}
-
-	@Bean
-	CloudFoundryOperations cloudFoundryOperations(CloudFoundryClient cloudFoundryClient, UaaClient uaaClient) {
-		return new CloudFoundryOperationsBuilder().cloudFoundryClient(cloudFoundryClient).uaaClient(uaaClient).build();
 	}
 }
