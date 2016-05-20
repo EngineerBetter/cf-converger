@@ -32,7 +32,7 @@ public class UploadTest {
 	public void triggersConvergence() throws Exception {
 		ClassPathResource fixture = new ClassPathResource("declaration.yml");
 		HttpHeaders requestHeaders = new HttpHeaders();
-		requestHeaders.add("Content-Type", "application/yaml");
+		requestHeaders.add("Content-Type", "application/x-yaml");
 		requestHeaders.add("Accept", "application/json");
 
 		URI uri = new URI("http://127.0.0.1:"+port);
