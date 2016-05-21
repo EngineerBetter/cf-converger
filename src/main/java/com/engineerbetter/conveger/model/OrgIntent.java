@@ -3,6 +3,8 @@ package com.engineerbetter.conveger.model;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.cloudfoundry.client.CloudFoundryClient;
+
 
 public class OrgIntent implements Intent
 {
@@ -16,7 +18,7 @@ public class OrgIntent implements Intent
 
 
 	@Override
-	public void resolve()
+	public void resolve(CloudFoundryClient cfClient)
 	{
 		//Look up in CloudController
 		this.id = Optional.of(UUID.randomUUID());

@@ -2,11 +2,13 @@ package com.engineerbetter.converger;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.cloudfoundry.client.CloudFoundryClient;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.TopologicalOrderIterator;
@@ -58,13 +60,13 @@ public class DagScratchpad
 		dag.addVertex(orgIntent);
 
 		for(Space space : declaration.org.spaces) {
-			SpaceIntent intent = new SpaceIntent(space.name);
+			SpaceIntent intent = new SpaceIntent(space.name, orgIntent);
 			dag.addVertex(intent);
 			dag.addDagEdge(orgIntent, intent);
 		}
 
 		List<Intent> ordered = orderDag(dag);
-		assertThat(ordered, contains(new OrgIntent("my-org"), new SpaceIntent("DEV"), new SpaceIntent("PROD")));
+		assertThat(ordered, contains(orgIntent, new SpaceIntent("DEV", orgIntent), new SpaceIntent("PROD", orgIntent)));
 
 		for(Intent intent : ordered) {
 			//Do I have dependencies?
@@ -81,7 +83,7 @@ public class DagScratchpad
 			}
 
 			//Now I have all that I need, do I exist?
-			intent.resolve();
+			intent.resolve(mock(CloudFoundryClient.class));
 			//If I exist, am I in the desired state?
 		}
 	}
