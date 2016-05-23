@@ -1,5 +1,18 @@
 ---
+version: 1
 org:
   name: my-lovely-org
+  org_managers:
+  - dan.young@engineerbetter.com
   spaces:
-  - name: my-space
+  - name: DEV
+    user_provided_services:
+    - name: OracleDB
+      credentials:
+        username: sa
+        password: secret
+    space_developers:
+    - daniel.jones@engineerbetter.com
+  - name: DEV
+    space_developers:
+    - daniel.jones@engineerbetter.com

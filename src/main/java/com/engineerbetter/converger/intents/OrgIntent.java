@@ -1,15 +1,17 @@
-package com.engineerbetter.conveger.model;
+package com.engineerbetter.converger.intents;
 
 import java.util.Optional;
-import java.util.UUID;
 
-import org.cloudfoundry.client.CloudFoundryClient;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import com.engineerbetter.converger.facade.CloudFoundryFacade;
 
-public class OrgIntent implements Intent
+public class OrgIntent implements IdentifiableIntent
 {
 	public final String name;
-	private Optional<UUID> id;
+	private Optional<String> id;
+	@Autowired
+	private CloudFoundryFacade cf;
 
 	public OrgIntent(String name)
 	{
@@ -18,14 +20,13 @@ public class OrgIntent implements Intent
 
 
 	@Override
-	public void resolve(CloudFoundryClient cfClient)
+	public void resolve()
 	{
-		//Look up in CloudController
-		this.id = Optional.of(UUID.randomUUID());
+		this.id = cf.findOrg(name);
 	}
 
 	@Override
-	public Optional<UUID> resolved()
+	public Optional<String> id()
 	{
 		return this.id;
 	}
@@ -36,9 +37,11 @@ public class OrgIntent implements Intent
 	{
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
+
 
 	@Override
 	public boolean equals(Object obj)
@@ -50,6 +53,12 @@ public class OrgIntent implements Intent
 		if (getClass() != obj.getClass())
 			return false;
 		OrgIntent other = (OrgIntent) obj;
+		if (id == null)
+		{
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
 		if (name == null)
 		{
 			if (other.name != null)
@@ -59,9 +68,5 @@ public class OrgIntent implements Intent
 		return true;
 	}
 
-	@Override
-	public String toString()
-	{
-		return "OrgIntent [name=" + name + "]";
-	}
+
 }

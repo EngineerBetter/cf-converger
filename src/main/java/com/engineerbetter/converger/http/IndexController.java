@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.engineerbetter.conveger.model.Declaration;
-import com.engineerbetter.conveger.model.Space;
+import com.engineerbetter.converger.model.Declaration;
+import com.engineerbetter.converger.model.Space;
 
 @RestController
 public class IndexController
