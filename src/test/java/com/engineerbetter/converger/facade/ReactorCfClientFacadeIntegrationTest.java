@@ -4,19 +4,20 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
+import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 public class ReactorCfClientFacadeIntegrationTest
 {
 	private CloudFoundryClient cfClient;
-	private CloudFoundryOperations cfOps;
 	private CloudFoundryFacade facade;
+	private String orgId;
 
 	@Before
 	public void setup()
@@ -31,18 +32,26 @@ public class ReactorCfClientFacadeIntegrationTest
 		}
 
 		cfClient = SpringCloudFoundryClient.builder().host(host).username(username).password(password).skipSslValidation(true).build();
-		cfOps = new CloudFoundryOperationsBuilder().cloudFoundryClient(cfClient).build();
 		facade = new ReactorCfClientFacade(cfClient);
+
+		String orgName = "converger-test-"+UUID.randomUUID().toString();
+		orgId = facade.createOrg(orgName);
+	}
+
+	@After
+	public void teardown()
+	{
+		facade.deleteOrg(orgId);
 	}
 
 	@Test
-	public void orgManagement()
+	public void spaceManagement()
 	{
-		assertThat(cfOps.organizations().list().filter(o -> o.getName().equals("test-org")).count().get(), is(0L));
-		String id = facade.createOrg("test-org");
-		assertThat(cfOps.organizations().list().filter(o -> o.getName().equals("test-org")).count().get(), is(1L));
-		assertThat(facade.findOrg("test-org"), is(Optional.of(id)));
-		facade.deleteOrg(id);
-		assertThat(cfOps.organizations().list().filter(o -> o.getName().equals("test-org")).count().get(), is(0L));
+		assertThat(cfClient.spaces().list(ListSpacesRequest.builder().organizationId(orgId).name("test-space").build()).get().getResources().size(), is(0));
+		String id = facade.createSpace("test-space", orgId);
+		assertThat(cfClient.spaces().list(ListSpacesRequest.builder().organizationId(orgId).name("test-space").build()).get().getResources().size(), is(1));
+		assertThat(facade.findSpace("test-space", orgId), is(Optional.of(id)));
+		facade.deleteSpace(id);
+		assertThat(cfClient.spaces().list(ListSpacesRequest.builder().organizationId(orgId).name("test-space").build()).get().getResources().size(), is(0));
 	}
 }

@@ -8,6 +8,11 @@ import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ReactorCfClientFacade implements CloudFoundryFacade
@@ -48,18 +53,27 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public Optional<String> findSpace(String name, String orgId)
 	{
-		return null;
+		ListSpacesResponse response = cf.spaces().list(ListSpacesRequest.builder().name(name).organizationId(orgId).build()).get();
+
+		if(response.getResources().size() > 0)
+		{
+			return Optional.of(response.getResources().get(0).getMetadata().getId());
+		}
+
+		return Optional.empty();
 	}
 
 	@Override
 	public String createSpace(String name, String orgId)
 	{
-		return null;
+		CreateSpaceResponse response = cf.spaces().create(CreateSpaceRequest.builder().name(name).organizationId(orgId).build()).get();
+		return response.getMetadata().getId();
 	}
 
 	@Override
 	public void deleteSpace(String id)
 	{
+		cf.spaces().delete(DeleteSpaceRequest.builder().spaceId(id).build()).get();
 	}
 
 	@Override
