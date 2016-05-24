@@ -50,3 +50,12 @@ $ curl -X POST --data @declaration.yml https://converger.cf-app.com/groups/non-p
 ## Why?
 
 Managing multiple Cloud Foundry instances is time-consuming and error-prone.
+
+## Testing
+
+Integration tests rely on the availability of a Cloud Foundry instance.
+
+```
+$ mvn clean test
+$ CF_HOST=https://api.bosh-lite.com CF_USERNAME=admin CF_PASSWORD=password mvn clean verify
+```
