@@ -17,7 +17,7 @@ public class YamlUnmarshallingTest
 		YAMLMapper mapper = new YAMLMapper();
 		Declaration declaration = mapper.readValue(resource.getFile(), Declaration.class);
 
-		assertThat(declaration.version, is(1));
+		assertThat(declaration.schemaVersion, is(1));
 		assertThat(declaration.org.name, is("my-lovely-org"));
 	}
 }
