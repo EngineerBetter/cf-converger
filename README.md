@@ -66,6 +66,8 @@ Reproduced here for convenience; for the canonical list see [Pivotal Tracker](ht
 * Cloud Foundry groups (being apply to apply to multiple instances)
 * Plugins (extra components to manage SDNs, PCF User invites, et al)
 
+Notice that apps are not on the list. Apps should be arriving courtesy of users or CI. If you have a different opinion, please get in touch as we'd love to hear your use cases.
+
 ## Testing
 
 Integration tests rely on the availability of a Cloud Foundry instance.
