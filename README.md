@@ -8,7 +8,9 @@ This project is work-in-progress; the features listed below are on the roadmap. 
 
 cf-converger runs as a web service that allows users to  post YAML files describing a Cloud Foundry organization and everything in it: spaces, users, roles, services, security groups et al. Upon posting this config, cf-converger will compare the desired state to the actual state of multiple Cloud Foundry instances, and present a plan of what actions will be performed. This can then be enacted, providing an easy way to set up everything you need in order to be able to start deploying apps.
 
-## Example Declaration
+## Example
+
+YAML declaration:
 
 ```
 ---
@@ -33,6 +35,10 @@ org:
   - name: PROD
     space_auditor:
     - operator@engineerbetter.com
+```
+
+```
+$ curl -X POST --data @declaration.yml https://converger.cf-app.com/groups/non-production
 ```
 
 ## Why?
