@@ -4,6 +4,12 @@ Declaratively converges the runtime configuration of multiple Cloud Foundry inst
 
 This project is work-in-progress; the features listed below are on the roadmap. To see how far we've got, check out the [cf-converger Pivotal Tracker](https://www.pivotaltracker.com/n/projects/1590869).
 
+## Status
+
+cf-converger is a work-in-progress. It is not ready to use. We are *very* interested in user feedback on the concept, so this README outlines the user experience that we're headed towards.
+
+The conceptual approach is based on experience of building a Ruby prototype. This implementation is written in Java in order to utilise the as-yet-unfinished [cf-java-client](https://github.com/cloudfoundry/cf-java-client).
+
 ## How does it work?
 
 cf-converger runs as a web service that allows users to  post YAML files describing a Cloud Foundry organization and everything in it: spaces, users, roles, services, security groups et al. Upon posting this config, cf-converger will compare the desired state to the actual state of multiple Cloud Foundry instances, and present a plan of what actions will be performed. This can then be enacted, providing an easy way to set up everything you need in order to be able to start deploying apps.
