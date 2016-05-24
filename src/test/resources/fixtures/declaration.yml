@@ -1,5 +1,5 @@
 ---
-version: 1
+schema_version: 1
 org:
   name: my-lovely-org
   org_managers:

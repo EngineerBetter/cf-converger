@@ -5,12 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Declaration
 {
+	public static final int SCHEMA_VERSION = 1;
 	public final int version;
 	public final Org org;
 
 	@JsonCreator
 	public Declaration(
-			@JsonProperty("version") int version,
+			@JsonProperty("schema_version") int version,
 			@JsonProperty("org") Org org
 			) {
 		this.version = version;
