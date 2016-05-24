@@ -1,5 +1,6 @@
 package com.engineerbetter.converger.facade;
 
+import java.util.Map;
 import java.util.Optional;
 
 public interface CloudFoundryFacade
@@ -27,7 +28,7 @@ public interface CloudFoundryFacade
 	void deleteSpace(String id);
 
 	Optional<String> findUps(String name, String spaceId);
-	String createUps();
+	String createUps(String name, Map<String, String> credentials, String spaceId);
 	void deleteUps(String id);
 
 	boolean userExists(String id);
