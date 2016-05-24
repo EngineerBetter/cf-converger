@@ -13,6 +13,6 @@ org:
         password: secret
     space_developers:
     - daniel.jones@engineerbetter.com
-  - name: DEV
+  - name: PROD
     space_developers:
     - daniel.jones@engineerbetter.com
