@@ -51,6 +51,21 @@ $ curl -X POST --data @declaration.yml https://converger.cf-app.com/groups/non-p
 
 Managing multiple Cloud Foundry instances is time-consuming and error-prone.
 
+## Feature Roadmap
+
+Reproduced here for convenience; for the canonical list see [Pivotal Tracker](https://www.pivotaltracker.com/n/projects/1590869).
+
+* Org management
+* Space management
+* UAA users
+* Cloud Foundry users
+* Role management
+* User-Provided Services
+* Security Groups
+* Marketplace Services
+* Cloud Foundry groups (being apply to apply to multiple instances)
+* Plugins (extra components to manage SDNs, PCF User invites, et al)
+
 ## Testing
 
 Integration tests rely on the availability of a Cloud Foundry instance.
