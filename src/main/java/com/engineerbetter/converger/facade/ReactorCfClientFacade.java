@@ -1,5 +1,6 @@
 package com.engineerbetter.converger.facade;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -11,11 +12,19 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersRequest;
+import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersResponse;
+import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
+import org.cloudfoundry.client.v2.spaces.ListSpaceManagersResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
@@ -23,6 +32,9 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvide
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
+import org.cloudfoundry.client.v2.users.ListUsersRequest;
+import org.cloudfoundry.client.v2.users.ListUsersResponse;
+import org.cloudfoundry.client.v2.users.UserResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class ReactorCfClientFacade implements CloudFoundryFacade
@@ -115,7 +127,8 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public boolean userExists(String id)
 	{
-		return false;
+		ListUsersResponse response = cf.users().list(ListUsersRequest.builder().build()).get();
+		return response.getResources().stream().filter(u -> u.getMetadata().getId().equals(id)).count() == 1L;
 	}
 
 	@Override
@@ -136,13 +149,31 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public boolean hasSpaceRole(String userId, String spaceId, SpaceRole role)
 	{
-		return false;
+		List<UserResource> users;
+		if(role == SpaceRole.SPACE_AUDITOR)
+		{
+			ListSpaceAuditorsResponse response = cf.spaces().listAuditors(ListSpaceAuditorsRequest.builder().spaceId(spaceId).build()).get();
+			users = response.getResources();
+		}
+		else if(role == SpaceRole.SPACE_DEVELOPER)
+		{
+			ListSpaceDevelopersResponse response = cf.spaces().listDevelopers(ListSpaceDevelopersRequest.builder().spaceId(spaceId).build()).get();
+			users = response.getResources();
+		}
+		else
+		{
+			ListSpaceManagersResponse response = cf.spaces().listManagers(ListSpaceManagersRequest.builder().spaceId(spaceId).build()).get();
+			users = response.getResources();
+		}
+
+		return users.stream().filter(u -> u.getMetadata().getId().equals(userId)).count() == 1L;
 	}
 
 	@Override
 	public boolean isUserInOrg(String userId, String orgId)
 	{
-		return false;
+		ListOrganizationUsersResponse response = cf.organizations().listUsers(ListOrganizationUsersRequest.builder().organizationId(orgId).build()).get();
+		return response.getResources().stream().filter(u -> u.getMetadata().getId().equals(userId)).count() == 1L;
 	}
 
 }
