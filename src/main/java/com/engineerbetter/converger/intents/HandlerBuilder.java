@@ -2,9 +2,7 @@ package com.engineerbetter.converger.intents;
 
 import com.engineerbetter.converger.resolution.Resolution;
 
-public interface Intent<R extends Resolution>
+public interface HandlerBuilder<I extends Intent<? extends Resolution>>
 {
-	R getResolution();
-
-	void setResolution(R resolution);
+	Handler<I> build(I intent);
 }

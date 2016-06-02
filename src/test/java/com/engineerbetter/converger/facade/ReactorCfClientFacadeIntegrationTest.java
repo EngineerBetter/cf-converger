@@ -50,26 +50,26 @@ public class ReactorCfClientFacadeIntegrationTest
 	@Test
 	public void spaceManagement()
 	{
-		assertThat(cfClient.spaces().list(ListSpacesRequest.builder().organizationId(orgId).name("test-space").build()).get().getResources().size(), is(0));
+		assertThat(cfClient.spaces().list(ListSpacesRequest.builder().organizationId(orgId).name("test-space").build()).block().getResources().size(), is(0));
 		String id = facade.createSpace("test-space", orgId);
-		assertThat(cfClient.spaces().list(ListSpacesRequest.builder().organizationId(orgId).name("test-space").build()).get().getResources().size(), is(1));
+		assertThat(cfClient.spaces().list(ListSpacesRequest.builder().organizationId(orgId).name("test-space").build()).block().getResources().size(), is(1));
 		assertThat(facade.findSpace("test-space", orgId), is(Optional.of(id)));
 		facade.deleteSpace(id);
-		assertThat(cfClient.spaces().list(ListSpacesRequest.builder().organizationId(orgId).name("test-space").build()).get().getResources().size(), is(0));
+		assertThat(cfClient.spaces().list(ListSpacesRequest.builder().organizationId(orgId).name("test-space").build()).block().getResources().size(), is(0));
 	}
 
 	@Test
 	public void upsManagement()
 	{
 		String spaceId = facade.createSpace("test-space", orgId);
-		assertThat(cfClient.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name("test-ups").build()).get().getResources().size(), is(0));
+		assertThat(cfClient.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name("test-ups").build()).block().getResources().size(), is(0));
 		Map<String, String> credentials = new HashMap<>();
 		credentials.put("username", "sa");
 		credentials.put("password", "blank");
 		String id = facade.createUps("test-ups", credentials, spaceId);
-		assertThat(cfClient.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name("test-ups").build()).get().getResources().size(), is(1));
+		assertThat(cfClient.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name("test-ups").build()).block().getResources().size(), is(1));
 		assertThat(facade.findUps("test-ups", spaceId), is(Optional.of(id)));
 		facade.deleteUps(id);
-		assertThat(cfClient.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name("test-ups").build()).get().getResources().size(), is(0));
+		assertThat(cfClient.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name("test-ups").build()).block().getResources().size(), is(0));
 	}
 }

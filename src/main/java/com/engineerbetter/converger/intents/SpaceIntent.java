@@ -1,38 +1,30 @@
 package com.engineerbetter.converger.intents;
 
-import java.util.Optional;
+import com.engineerbetter.converger.properties.NameProperty;
+import com.engineerbetter.converger.resolution.IdentifiableResolution;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.engineerbetter.converger.facade.CloudFoundryFacade;
-
-public class SpaceIntent implements IdentifiableIntent
+public class SpaceIntent implements Intent<IdentifiableResolution>
 {
-	public final String name;
+	public final NameProperty name;
 	public final OrgIntent orgIntent;
-	private Optional<String> id;
-	@Autowired
-	private CloudFoundryFacade cf;
+	private IdentifiableResolution resolution;
 
-	public SpaceIntent(String name, OrgIntent org)
+	public SpaceIntent(NameProperty name, OrgIntent orgIntent)
 	{
 		this.name = name;
-		this.orgIntent = org;
+		this.orgIntent = orgIntent;
 	}
 
 	@Override
-	public void resolve()
+	public IdentifiableResolution getResolution()
 	{
-		if(orgIntent.id().isPresent())
-		{
-			this.id = cf.findSpace(name, orgIntent.id().get());
-		}
+		return resolution;
 	}
 
 	@Override
-	public Optional<String> id()
+	public void setResolution(IdentifiableResolution resolution)
 	{
-		return this.id;
+		this.resolution = resolution;
 	}
 
 	@Override
@@ -40,7 +32,6 @@ public class SpaceIntent implements IdentifiableIntent
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result
 				+ ((orgIntent == null) ? 0 : orgIntent.hashCode());
@@ -57,12 +48,6 @@ public class SpaceIntent implements IdentifiableIntent
 		if (getClass() != obj.getClass())
 			return false;
 		SpaceIntent other = (SpaceIntent) obj;
-		if (id == null)
-		{
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
 		if (name == null)
 		{
 			if (other.name != null)
@@ -76,5 +61,11 @@ public class SpaceIntent implements IdentifiableIntent
 		} else if (!orgIntent.equals(other.orgIntent))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "SpaceIntent [name=" + name + ", orgIntent=" + orgIntent + "]";
 	}
 }

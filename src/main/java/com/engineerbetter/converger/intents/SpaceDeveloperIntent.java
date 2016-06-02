@@ -1,16 +1,13 @@
 package com.engineerbetter.converger.intents;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.engineerbetter.converger.resolution.RelationshipResolution;
 
-import com.engineerbetter.converger.facade.CloudFoundryFacade;
 
-public class SpaceDeveloperIntent implements RelationshipIntent
+public class SpaceDeveloperIntent implements Intent<RelationshipResolution>
 {
-	private final SpaceIntent spaceIntent;
-	private final CfUserIntent userIntent;
-	private boolean present;
-	@Autowired
-	private CloudFoundryFacade cf;
+	public final SpaceIntent spaceIntent;
+	public final CfUserIntent userIntent;
+	private RelationshipResolution resolution;
 
 	public SpaceDeveloperIntent(SpaceIntent space, CfUserIntent user)
 	{
@@ -18,19 +15,17 @@ public class SpaceDeveloperIntent implements RelationshipIntent
 		this.userIntent = user;
 	}
 
+
 	@Override
-	public void resolve()
+	public RelationshipResolution getResolution()
 	{
-		if(userIntent.id().isPresent() && spaceIntent.id().isPresent())
-		{
-			present = cf.hasSpaceRole(userIntent.id().get(), spaceIntent.id().get(), CloudFoundryFacade.SpaceRole.SPACE_DEVELOPER);
-		}
+		return resolution;
 	}
 
 	@Override
-	public boolean present()
+	public void setResolution(RelationshipResolution resolution)
 	{
-		return present;
+		this.resolution = resolution;
 	}
 
 	@Override
@@ -38,7 +33,6 @@ public class SpaceDeveloperIntent implements RelationshipIntent
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (present ? 1231 : 1237);
 		result = prime * result
 				+ ((spaceIntent == null) ? 0 : spaceIntent.hashCode());
 		result = prime * result
@@ -56,8 +50,6 @@ public class SpaceDeveloperIntent implements RelationshipIntent
 		if (getClass() != obj.getClass())
 			return false;
 		SpaceDeveloperIntent other = (SpaceDeveloperIntent) obj;
-		if (present != other.present)
-			return false;
 		if (spaceIntent == null)
 		{
 			if (other.spaceIntent != null)
@@ -71,5 +63,12 @@ public class SpaceDeveloperIntent implements RelationshipIntent
 		} else if (!userIntent.equals(other.userIntent))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "SpaceDeveloperIntent [spaceIntent=" + spaceIntent
+				+ ", userIntent=" + userIntent + "]";
 	}
 }

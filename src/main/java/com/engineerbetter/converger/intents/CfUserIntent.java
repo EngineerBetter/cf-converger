@@ -1,45 +1,37 @@
 package com.engineerbetter.converger.intents;
 
-import java.util.Optional;
+import com.engineerbetter.converger.resolution.IdentifiableResolution;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.engineerbetter.converger.facade.CloudFoundryFacade;
-
-public class CfUserIntent implements IdentifiableIntent
+public class CfUserIntent implements Intent<IdentifiableResolution>
 {
-	private final UaaUserIntent uaaUserIntent;
-	private Optional<String> id;
-	@Autowired
-	private CloudFoundryFacade cf;
-
+	public final UaaUserIntent uaaUserIntent;
+	private IdentifiableResolution resolution;
 
 	public CfUserIntent(UaaUserIntent uaaUserIntent)
 	{
 		this.uaaUserIntent = uaaUserIntent;
 	}
 
-	@Override
-	public void resolve()
-	{
-		if(uaaUserIntent.id().isPresent() && cf.userExists(uaaUserIntent.id().get()))
-		{
-			id = uaaUserIntent.id();
-		}
-	}
 
 	@Override
-	public Optional<String> id()
+	public IdentifiableResolution getResolution()
 	{
-		return id;
+		return resolution;
 	}
+
+
+	@Override
+	public void setResolution(IdentifiableResolution resolution)
+	{
+		this.resolution = resolution;
+	}
+
 
 	@Override
 	public int hashCode()
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result
 				+ ((uaaUserIntent == null) ? 0 : uaaUserIntent.hashCode());
 		return result;
@@ -55,12 +47,6 @@ public class CfUserIntent implements IdentifiableIntent
 		if (getClass() != obj.getClass())
 			return false;
 		CfUserIntent other = (CfUserIntent) obj;
-		if (id == null)
-		{
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
 		if (uaaUserIntent == null)
 		{
 			if (other.uaaUserIntent != null)
@@ -69,5 +55,10 @@ public class CfUserIntent implements IdentifiableIntent
 			return false;
 		return true;
 	}
-}
 
+	@Override
+	public String toString()
+	{
+		return "CfUserIntent [uaaUserIntent=" + uaaUserIntent + "]";
+	}
+}

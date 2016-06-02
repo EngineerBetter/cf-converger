@@ -38,9 +38,9 @@ public class UploadIntegrationTest {
 
 	@After
 	public void teardown() {
-		ListOrganizationsResponse response = cfClient.organizations().list(ListOrganizationsRequest.builder().name("my-lovely-org").build()).get();
+		ListOrganizationsResponse response = cfClient.organizations().list(ListOrganizationsRequest.builder().name("my-lovely-org").build()).block();
 		String orgId = response.getResources().get(0).getMetadata().getId();
-		cfClient.organizations().delete(DeleteOrganizationRequest.builder().organizationId(orgId).build()).get();
+		cfClient.organizations().delete(DeleteOrganizationRequest.builder().organizationId(orgId).build()).block();
 	}
 
 	@Test

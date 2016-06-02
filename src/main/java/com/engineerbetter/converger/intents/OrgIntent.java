@@ -1,34 +1,30 @@
 package com.engineerbetter.converger.intents;
 
-import java.util.Optional;
+import com.engineerbetter.converger.properties.NameProperty;
+import com.engineerbetter.converger.resolution.IdentifiableResolution;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.engineerbetter.converger.facade.CloudFoundryFacade;
-
-public class OrgIntent implements IdentifiableIntent
+public final class OrgIntent implements Intent<IdentifiableResolution>
 {
-	public final String name;
-	private Optional<String> id;
-	@Autowired
-	private CloudFoundryFacade cf;
+	public final NameProperty name;
+	private IdentifiableResolution resolution;
 
-	public OrgIntent(String name)
+
+	public OrgIntent(NameProperty name)
 	{
 		this.name = name;
 	}
 
 
 	@Override
-	public void resolve()
+	public IdentifiableResolution getResolution()
 	{
-		this.id = cf.findOrg(name);
+		return resolution;
 	}
 
 	@Override
-	public Optional<String> id()
+	public void setResolution(IdentifiableResolution resolution)
 	{
-		return this.id;
+		this.resolution = resolution;
 	}
 
 
@@ -37,11 +33,9 @@ public class OrgIntent implements IdentifiableIntent
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj)
@@ -53,12 +47,6 @@ public class OrgIntent implements IdentifiableIntent
 		if (getClass() != obj.getClass())
 			return false;
 		OrgIntent other = (OrgIntent) obj;
-		if (id == null)
-		{
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
 		if (name == null)
 		{
 			if (other.name != null)
@@ -68,5 +56,9 @@ public class OrgIntent implements IdentifiableIntent
 		return true;
 	}
 
-
+	@Override
+	public String toString()
+	{
+		return "OrgIntent [name=" + name + "]";
+	}
 }

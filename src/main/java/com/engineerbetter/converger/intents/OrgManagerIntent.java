@@ -1,16 +1,13 @@
 package com.engineerbetter.converger.intents;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.engineerbetter.converger.resolution.RelationshipResolution;
 
-import com.engineerbetter.converger.facade.CloudFoundryFacade;
 
-public class OrgManagerIntent implements RelationshipIntent
+public class OrgManagerIntent implements Intent<RelationshipResolution>
 {
-	private final OrgIntent orgIntent;
-	private final CfUserIntent userIntent;
-	private boolean present;
-	@Autowired
-	private CloudFoundryFacade cf;
+	public final OrgIntent orgIntent;
+	public final CfUserIntent userIntent;
+	private RelationshipResolution resolution;
 
 	public OrgManagerIntent(OrgIntent org, CfUserIntent user)
 	{
@@ -19,18 +16,15 @@ public class OrgManagerIntent implements RelationshipIntent
 	}
 
 	@Override
-	public void resolve()
+	public RelationshipResolution getResolution()
 	{
-		if(userIntent.id().isPresent() && orgIntent.id().isPresent())
-		{
-			present = cf.hasOrgRole(userIntent.id().get(), orgIntent.id().get(), CloudFoundryFacade.OrgRole.ORG_MANAGER);
-		}
+		return resolution;
 	}
 
 	@Override
-	public boolean present()
+	public void setResolution(RelationshipResolution resolution)
 	{
-		return present;
+		this.resolution = resolution;
 	}
 
 	@Override
@@ -40,7 +34,6 @@ public class OrgManagerIntent implements RelationshipIntent
 		int result = 1;
 		result = prime * result
 				+ ((orgIntent == null) ? 0 : orgIntent.hashCode());
-		result = prime * result + (present ? 1231 : 1237);
 		result = prime * result
 				+ ((userIntent == null) ? 0 : userIntent.hashCode());
 		return result;
@@ -62,8 +55,6 @@ public class OrgManagerIntent implements RelationshipIntent
 				return false;
 		} else if (!orgIntent.equals(other.orgIntent))
 			return false;
-		if (present != other.present)
-			return false;
 		if (userIntent == null)
 		{
 			if (other.userIntent != null)
@@ -71,5 +62,12 @@ public class OrgManagerIntent implements RelationshipIntent
 		} else if (!userIntent.equals(other.userIntent))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "OrgManagerIntent [orgIntent=" + orgIntent + ", userIntent="
+				+ userIntent + "]";
 	}
 }

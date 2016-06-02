@@ -1,27 +1,28 @@
 package com.engineerbetter.converger.http;
 
-import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
-import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
-import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.engineerbetter.converger.intents.Handler;
+import com.engineerbetter.converger.intents.Intent;
+import com.engineerbetter.converger.intents.OrderedHandlerBuilder;
 import com.engineerbetter.converger.model.Declaration;
-import com.engineerbetter.converger.model.Space;
+import com.engineerbetter.converger.resolution.Resolution;
 
 @RestController
 public class IndexController
 {
-	private final CloudFoundryClient cfClient;
+	private final OrderedHandlerBuilder orderedIntentBuilder;
 
 	@Autowired
-	public IndexController(CloudFoundryClient cfClient)
+	public IndexController(OrderedHandlerBuilder orderedIntentBuilder)
 	{
-		this.cfClient = cfClient;
+		this.orderedIntentBuilder = orderedIntentBuilder;
 	}
 
 	@RequestMapping("/")
@@ -33,12 +34,11 @@ public class IndexController
 	@RequestMapping(method = RequestMethod.POST, value = "/", consumes = "application/x-yaml")
 	public String upload(@RequestBody Declaration declaration) throws Exception
 	{
-		CreateOrganizationResponse response = cfClient.organizations().create(CreateOrganizationRequest.builder().name(declaration.org.name).build()).get();
-
-		for(Space space : declaration.org.spaces) {
-			cfClient.spaces().create(CreateSpaceRequest.builder().organizationId(response.getMetadata().getId()).name(space.name).build()).get();
+		List<Handler<? extends Intent<? extends Resolution>>> handlers = orderedIntentBuilder.getOrderedHandlers(declaration);
+		for(Handler<? extends Intent<? extends Resolution>> handler : handlers)
+		{
+			handler.resolve();
 		}
-
-		return "Converged org " + declaration.org.name;
+		return "b0rk";
 	}
 }

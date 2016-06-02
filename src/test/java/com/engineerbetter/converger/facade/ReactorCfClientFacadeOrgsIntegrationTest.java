@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
-import org.cloudfoundry.operations.CloudFoundryOperationsBuilder;
+import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
 import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,18 +31,18 @@ public class ReactorCfClientFacadeOrgsIntegrationTest
 		}
 
 		cfClient = SpringCloudFoundryClient.builder().host(host).username(username).password(password).skipSslValidation(true).build();
-		cfOps = new CloudFoundryOperationsBuilder().cloudFoundryClient(cfClient).build();
+		cfOps = DefaultCloudFoundryOperations.builder().cloudFoundryClient(cfClient).build();
 		facade = new ReactorCfClientFacade(cfClient);
 	}
 
 	@Test
 	public void orgManagement()
 	{
-		assertThat(cfOps.organizations().list().filter(o -> o.getName().equals("test-org")).count().get(), is(0L));
+		assertThat(cfOps.organizations().list().filter(o -> o.getName().equals("test-org")).count().block(), is(0L));
 		String id = facade.createOrg("test-org");
-		assertThat(cfOps.organizations().list().filter(o -> o.getName().equals("test-org")).count().get(), is(1L));
+		assertThat(cfOps.organizations().list().filter(o -> o.getName().equals("test-org")).count().block(), is(1L));
 		assertThat(facade.findOrg("test-org"), is(Optional.of(id)));
 		facade.deleteOrg(id);
-		assertThat(cfOps.organizations().list().filter(o -> o.getName().equals("test-org")).count().get(), is(0L));
+		assertThat(cfOps.organizations().list().filter(o -> o.getName().equals("test-org")).count().block(), is(0L));
 	}
 }

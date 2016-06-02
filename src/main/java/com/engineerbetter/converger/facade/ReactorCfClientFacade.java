@@ -50,7 +50,7 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public Optional<String> findOrg(String name)
 	{
-		ListOrganizationsResponse response = cf.organizations().list(ListOrganizationsRequest.builder().name(name).build()).get();
+		ListOrganizationsResponse response = cf.organizations().list(ListOrganizationsRequest.builder().name(name).build()).block();
 		if(response.getResources().size() > 0)
 		{
 			return Optional.of(response.getResources().get(0).getMetadata().getId());
@@ -62,20 +62,20 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public String createOrg(String name)
 	{
-		CreateOrganizationResponse response = cf.organizations().create(CreateOrganizationRequest.builder().name(name).build()).get();
+		CreateOrganizationResponse response = cf.organizations().create(CreateOrganizationRequest.builder().name(name).build()).block();
 		return response.getMetadata().getId();
 	}
 
 	@Override
 	public void deleteOrg(String id)
 	{
-		cf.organizations().delete(DeleteOrganizationRequest.builder().organizationId(id).recursive(true).build()).get();
+		cf.organizations().delete(DeleteOrganizationRequest.builder().organizationId(id).recursive(true).build()).block();
 	}
 
 	@Override
 	public Optional<String> findSpace(String name, String orgId)
 	{
-		ListSpacesResponse response = cf.spaces().list(ListSpacesRequest.builder().name(name).organizationId(orgId).build()).get();
+		ListSpacesResponse response = cf.spaces().list(ListSpacesRequest.builder().name(name).organizationId(orgId).build()).block();
 
 		if(response.getResources().size() > 0)
 		{
@@ -88,20 +88,20 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public String createSpace(String name, String orgId)
 	{
-		CreateSpaceResponse response = cf.spaces().create(CreateSpaceRequest.builder().name(name).organizationId(orgId).build()).get();
+		CreateSpaceResponse response = cf.spaces().create(CreateSpaceRequest.builder().name(name).organizationId(orgId).build()).block();
 		return response.getMetadata().getId();
 	}
 
 	@Override
 	public void deleteSpace(String id)
 	{
-		cf.spaces().delete(DeleteSpaceRequest.builder().spaceId(id).build()).get();
+		cf.spaces().delete(DeleteSpaceRequest.builder().spaceId(id).build()).block();
 	}
 
 	@Override
 	public Optional<String> findUps(String name, String spaceId)
 	{
-		ListUserProvidedServiceInstancesResponse response = cf.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().name(name).build()).get();
+		ListUserProvidedServiceInstancesResponse response = cf.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().name(name).build()).block();
 
 		if(response.getResources().size() > 0)
 		{
@@ -114,20 +114,20 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public String createUps(String name, Map<String, String> credentials, String spaceId)
 	{
-		CreateUserProvidedServiceInstanceResponse response = cf.userProvidedServiceInstances().create(CreateUserProvidedServiceInstanceRequest.builder().name(name).credentials(credentials).spaceId(spaceId).build()).get();
+		CreateUserProvidedServiceInstanceResponse response = cf.userProvidedServiceInstances().create(CreateUserProvidedServiceInstanceRequest.builder().name(name).credentials(credentials).spaceId(spaceId).build()).block();
 		return response.getMetadata().getId();
 	}
 
 	@Override
 	public void deleteUps(String id)
 	{
-		cf.userProvidedServiceInstances().delete(DeleteUserProvidedServiceInstanceRequest.builder().userProvidedServiceInstanceId(id).build()).get();
+		cf.userProvidedServiceInstances().delete(DeleteUserProvidedServiceInstanceRequest.builder().userProvidedServiceInstanceId(id).build()).block();
 	}
 
 	@Override
 	public boolean userExists(String id)
 	{
-		ListUsersResponse response = cf.users().list(ListUsersRequest.builder().build()).get();
+		ListUsersResponse response = cf.users().list(ListUsersRequest.builder().build()).block();
 		return response.getResources().stream().filter(u -> u.getMetadata().getId().equals(id)).count() == 1L;
 	}
 
@@ -136,12 +136,12 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	{
 		if(role == OrgRole.ORG_MANAGER)
 		{
-			ListOrganizationManagersResponse response = cf.organizations().listManagers(ListOrganizationManagersRequest.builder().organizationId(orgId).build()).get();
+			ListOrganizationManagersResponse response = cf.organizations().listManagers(ListOrganizationManagersRequest.builder().organizationId(orgId).build()).block();
 			return response.getResources().stream().filter(r -> r.getMetadata().getId().equals(userId)).count() == 1;
 		}
 		else
 		{
-			ListOrganizationAuditorsResponse response = cf.organizations().listAuditors(ListOrganizationAuditorsRequest.builder().organizationId(orgId).build()).get();
+			ListOrganizationAuditorsResponse response = cf.organizations().listAuditors(ListOrganizationAuditorsRequest.builder().organizationId(orgId).build()).block();
 			return response.getResources().stream().filter(r -> r.getMetadata().getId().equals(userId)).count() == 1;
 		}
 	}
@@ -152,17 +152,17 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		List<UserResource> users;
 		if(role == SpaceRole.SPACE_AUDITOR)
 		{
-			ListSpaceAuditorsResponse response = cf.spaces().listAuditors(ListSpaceAuditorsRequest.builder().spaceId(spaceId).build()).get();
+			ListSpaceAuditorsResponse response = cf.spaces().listAuditors(ListSpaceAuditorsRequest.builder().spaceId(spaceId).build()).block();
 			users = response.getResources();
 		}
 		else if(role == SpaceRole.SPACE_DEVELOPER)
 		{
-			ListSpaceDevelopersResponse response = cf.spaces().listDevelopers(ListSpaceDevelopersRequest.builder().spaceId(spaceId).build()).get();
+			ListSpaceDevelopersResponse response = cf.spaces().listDevelopers(ListSpaceDevelopersRequest.builder().spaceId(spaceId).build()).block();
 			users = response.getResources();
 		}
 		else
 		{
-			ListSpaceManagersResponse response = cf.spaces().listManagers(ListSpaceManagersRequest.builder().spaceId(spaceId).build()).get();
+			ListSpaceManagersResponse response = cf.spaces().listManagers(ListSpaceManagersRequest.builder().spaceId(spaceId).build()).block();
 			users = response.getResources();
 		}
 
@@ -172,7 +172,7 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public boolean isUserInOrg(String userId, String orgId)
 	{
-		ListOrganizationUsersResponse response = cf.organizations().listUsers(ListOrganizationUsersRequest.builder().organizationId(orgId).build()).get();
+		ListOrganizationUsersResponse response = cf.organizations().listUsers(ListOrganizationUsersRequest.builder().organizationId(orgId).build()).block();
 		return response.getResources().stream().filter(u -> u.getMetadata().getId().equals(userId)).count() == 1L;
 	}
 

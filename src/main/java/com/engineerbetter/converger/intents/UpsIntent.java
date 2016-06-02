@@ -1,43 +1,34 @@
 package com.engineerbetter.converger.intents;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import com.engineerbetter.converger.properties.UpsProperties;
+import com.engineerbetter.converger.resolution.MutableResolution;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.engineerbetter.converger.facade.CloudFoundryFacade;
-
-public class UpsIntent implements IdentifiableIntent
+public class UpsIntent implements Intent<MutableResolution>
 {
-	public final String name;
-	public final Map<String, String> credentials;
-	private final SpaceIntent spaceIntent;
-	private Optional<String> id = Optional.empty();
-	@Autowired
-	private CloudFoundryFacade cf;
+	public final UpsProperties upsProperties;
+	public final SpaceIntent spaceIntent;
+	private MutableResolution resolution;
 
-	public UpsIntent(String name, Map<String, String> credentials, SpaceIntent space)
+	public UpsIntent(UpsProperties upsProperties, SpaceIntent spaceIntent)
 	{
-		this.name = name;
-		this.credentials = Collections.unmodifiableMap(credentials);
-		this.spaceIntent = space;
+		this.upsProperties = upsProperties;
+		this.spaceIntent = spaceIntent;
 	}
+
 
 	@Override
-	public Optional<String> id()
+	public MutableResolution getResolution()
 	{
-		return id;
+		return resolution;
 	}
 
+
 	@Override
-	public void resolve()
+	public void setResolution(MutableResolution resolution)
 	{
-		if(spaceIntent.id().isPresent())
-		{
-			cf.findUps(name, spaceIntent.id().get());
-		}
+		this.resolution = resolution;
 	}
+
 
 	@Override
 	public int hashCode()
@@ -45,11 +36,9 @@ public class UpsIntent implements IdentifiableIntent
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((credentials == null) ? 0 : credentials.hashCode());
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result
 				+ ((spaceIntent == null) ? 0 : spaceIntent.hashCode());
+		result = prime * result
+				+ ((upsProperties == null) ? 0 : upsProperties.hashCode());
 		return result;
 	}
 
@@ -63,30 +52,25 @@ public class UpsIntent implements IdentifiableIntent
 		if (getClass() != obj.getClass())
 			return false;
 		UpsIntent other = (UpsIntent) obj;
-		if (credentials == null)
-		{
-			if (other.credentials != null)
-				return false;
-		} else if (!credentials.equals(other.credentials))
-			return false;
-		if (id == null)
-		{
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		if (name == null)
-		{
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
 		if (spaceIntent == null)
 		{
 			if (other.spaceIntent != null)
 				return false;
 		} else if (!spaceIntent.equals(other.spaceIntent))
 			return false;
+		if (upsProperties == null)
+		{
+			if (other.upsProperties != null)
+				return false;
+		} else if (!upsProperties.equals(other.upsProperties))
+			return false;
 		return true;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "UpsIntent [upsProperties=" + upsProperties + ", spaceIntent="
+				+ spaceIntent + "]";
 	}
 }

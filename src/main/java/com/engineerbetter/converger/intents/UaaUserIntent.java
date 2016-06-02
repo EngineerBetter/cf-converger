@@ -1,41 +1,38 @@
 package com.engineerbetter.converger.intents;
 
-import java.util.Optional;
+import com.engineerbetter.converger.properties.NameProperty;
+import com.engineerbetter.converger.resolution.IdentifiableResolution;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.engineerbetter.converger.facade.UaaFacade;
-
-public class UaaUserIntent implements IdentifiableIntent
+public class UaaUserIntent implements Intent<IdentifiableResolution>
 {
-	public final String name;
-	private Optional<String> id = Optional.empty();
-	@Autowired
-	private UaaFacade uaa;
+	public final NameProperty name;
+	private IdentifiableResolution resolution;
 
-	public UaaUserIntent(String name)
+	public UaaUserIntent(NameProperty name)
 	{
 		this.name = name;
 	}
 
-	@Override
-	public void resolve()
-	{
-		id = uaa.findUser(name);
-	}
 
 	@Override
-	public Optional<String> id()
+	public IdentifiableResolution getResolution()
 	{
-		return id;
+		return resolution;
 	}
+
+
+	@Override
+	public void setResolution(IdentifiableResolution resolution)
+	{
+		this.resolution = resolution;
+	}
+
 
 	@Override
 	public int hashCode()
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
@@ -50,12 +47,6 @@ public class UaaUserIntent implements IdentifiableIntent
 		if (getClass() != obj.getClass())
 			return false;
 		UaaUserIntent other = (UaaUserIntent) obj;
-		if (id == null)
-		{
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
 		if (name == null)
 		{
 			if (other.name != null)
@@ -63,5 +54,11 @@ public class UaaUserIntent implements IdentifiableIntent
 		} else if (!name.equals(other.name))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "UaaUserIntent [name=" + name + "]";
 	}
 }
