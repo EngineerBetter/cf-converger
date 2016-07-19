@@ -1,0 +1,16 @@
+---
+jobs:
+- name: unit-test
+  public: true
+  plan:
+  - get: cf-converger
+    trigger: true
+  - task: unit-test
+    file: cf-converger/ci/unit-test/task.yml
+
+resources:
+- name: cf-converger
+  type: git
+  source: 
+    uri: https://github.com/EngineerBetter/cf-converger.git
+    branch: master
