@@ -8,7 +8,11 @@ import java.util.Optional;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
-import org.cloudfoundry.spring.client.SpringCloudFoundryClient;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.DefaultConnectionContext;
+import org.cloudfoundry.reactor.TokenProvider;
+import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
+import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,7 +34,9 @@ public class ReactorCfClientFacadeOrgsIntegrationTest
 			throw new RuntimeException("CF_HOST, CF_USERNAME and CF_PASSWORD must be set");
 		}
 
-		cfClient = SpringCloudFoundryClient.builder().host(host).username(username).password(password).skipSslValidation(true).build();
+		ConnectionContext connectionContext = DefaultConnectionContext.builder().apiHost(host).skipSslValidation(true).build();
+		TokenProvider tokenProvider = PasswordGrantTokenProvider.builder().username(username).password(password).build();
+		cfClient = ReactorCloudFoundryClient.builder().connectionContext(connectionContext).tokenProvider(tokenProvider).build();
 		cfOps = DefaultCloudFoundryOperations.builder().cloudFoundryClient(cfClient).build();
 		facade = new ReactorCfClientFacade(cfClient);
 	}
