@@ -7,4 +7,5 @@ image_resource:
 inputs:
 - name: cf-converger
 run:
-  path: cf-converger/ci/unit-test/run
+  path: ci/unit-test/run
+  dir: cf-converger/
