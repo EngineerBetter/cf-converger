@@ -2,6 +2,7 @@ package com.engineerbetter.converger.model;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 
@@ -9,6 +10,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
+import com.engineerbetter.converger.facade.CloudFoundryFacade;
+import com.engineerbetter.converger.facade.UaaFacade;
 import com.engineerbetter.converger.intents.CfFacadeCfUserHandlerBuilder;
 import com.engineerbetter.converger.intents.CfFacadeOrgHandlerBuilder;
 import com.engineerbetter.converger.intents.CfFacadeOrgManagerHandlerBuilder;
@@ -49,15 +52,18 @@ public class HardcodedOrderedIntentBuilderTest
 		ClassPathResource resource = new ClassPathResource("fixtures/declaration.yml");
 		fixture = mapper.readValue(resource.getFile(), Declaration.class);
 
+		CloudFoundryFacade cf = mock(CloudFoundryFacade.class);
+		UaaFacade uaa = mock(UaaFacade.class);
+
 		handlerFactory = new TypeReferenceMapHandlerFactory();
-		handlerFactory.put(new TypeReference<HandlerBuilder<OrgIntent>>() {}, new CfFacadeOrgHandlerBuilder());
-		handlerFactory.put(new TypeReference<HandlerBuilder<UserOrgIntent>>() {}, new CfFacadeUserOrgHandlerBuilder());
-		handlerFactory.put(new TypeReference<HandlerBuilder<CfUserIntent>>() {}, new CfFacadeCfUserHandlerBuilder());
-		handlerFactory.put(new TypeReference<HandlerBuilder<UaaUserIntent>>() {}, new UaaFacadeUaaUserHandlerBuilder());
-		handlerFactory.put(new TypeReference<HandlerBuilder<OrgManagerIntent>>() {}, new CfFacadeOrgManagerHandlerBuilder());
-		handlerFactory.put(new TypeReference<HandlerBuilder<SpaceIntent>>() {}, new CfFacadeSpaceHandlerBuilder());
-		handlerFactory.put(new TypeReference<HandlerBuilder<SpaceDeveloperIntent>>() {}, new CfFacadeSpaceDeveloperHandlerBuilder());
-		handlerFactory.put(new TypeReference<HandlerBuilder<UpsIntent>>() {}, new CfFacadeUpsHandlerBuilder());
+		handlerFactory.put(new TypeReference<HandlerBuilder<OrgIntent>>() {}, new CfFacadeOrgHandlerBuilder(cf));
+		handlerFactory.put(new TypeReference<HandlerBuilder<UserOrgIntent>>() {}, new CfFacadeUserOrgHandlerBuilder(cf));
+		handlerFactory.put(new TypeReference<HandlerBuilder<CfUserIntent>>() {}, new CfFacadeCfUserHandlerBuilder(cf));
+		handlerFactory.put(new TypeReference<HandlerBuilder<UaaUserIntent>>() {}, new UaaFacadeUaaUserHandlerBuilder(uaa));
+		handlerFactory.put(new TypeReference<HandlerBuilder<OrgManagerIntent>>() {}, new CfFacadeOrgManagerHandlerBuilder(cf));
+		handlerFactory.put(new TypeReference<HandlerBuilder<SpaceIntent>>() {}, new CfFacadeSpaceHandlerBuilder(cf));
+		handlerFactory.put(new TypeReference<HandlerBuilder<SpaceDeveloperIntent>>() {}, new CfFacadeSpaceDeveloperHandlerBuilder(cf));
+		handlerFactory.put(new TypeReference<HandlerBuilder<UpsIntent>>() {}, new CfFacadeUpsHandlerBuilder(cf));
 
 		builder = new HardcodedOrderedHandlerBuilder(handlerFactory);
 	}

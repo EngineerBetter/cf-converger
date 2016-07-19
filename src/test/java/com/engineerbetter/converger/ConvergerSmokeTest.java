@@ -3,7 +3,6 @@ package com.engineerbetter.converger;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
-import org.cloudfoundry.client.CloudFoundryClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -12,7 +11,6 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,6 +18,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
 import com.engineerbetter.converger.ConvergerSmokeTest.SmokeTestConfig;
+import com.engineerbetter.converger.facade.CloudFoundryFacade;
+import com.engineerbetter.converger.facade.UaaFacade;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes={ConvergerApplication.class, SmokeTestConfig.class})
@@ -42,10 +42,15 @@ public class ConvergerSmokeTest
 	public static class SmokeTestConfig
 	{
 		@Bean
-		@Primary
-		CloudFoundryClient mockCfClient()
+		CloudFoundryFacade mockCf()
 		{
-			return Mockito.mock(CloudFoundryClient.class);
+			return Mockito.mock(CloudFoundryFacade.class);
+		}
+
+		@Bean
+		UaaFacade mockUaa()
+		{
+			return Mockito.mock(UaaFacade.class);
 		}
 	}
 }

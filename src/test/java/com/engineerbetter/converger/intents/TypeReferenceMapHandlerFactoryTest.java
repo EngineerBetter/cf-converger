@@ -18,7 +18,7 @@ public class TypeReferenceMapHandlerFactoryTest
 	public void setup()
 	{
 		factory = new TypeReferenceMapHandlerFactory();
-		factory.put(new TypeReference<HandlerBuilder<OrgIntent>>() {}, new CfFacadeOrgHandlerBuilder());
+		factory.put(new TypeReference<HandlerBuilder<OrgIntent>>() {}, new CfFacadeOrgHandlerBuilder(null));
 	}
 
 	@Test

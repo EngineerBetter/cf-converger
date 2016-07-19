@@ -1,10 +1,18 @@
 package com.engineerbetter.converger.intents;
 
-public class CfFacadeSpaceHandlerBuilder implements HandlerBuilder<SpaceIntent>
+import com.engineerbetter.converger.facade.CloudFoundryFacade;
+
+public class CfFacadeSpaceHandlerBuilder extends CfFacadeHandlerBuilder<SpaceIntent>
 {
+
+	public CfFacadeSpaceHandlerBuilder(CloudFoundryFacade cf)
+	{
+		super(cf);
+	}
+
 	@Override
 	public Handler<SpaceIntent> build(SpaceIntent intent)
 	{
-		return new CfFacadeSpaceHandler(intent, null);
+		return new CfFacadeSpaceHandler(intent, cf);
 	}
 }

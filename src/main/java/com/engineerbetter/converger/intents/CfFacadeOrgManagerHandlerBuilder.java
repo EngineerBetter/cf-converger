@@ -1,10 +1,18 @@
 package com.engineerbetter.converger.intents;
 
-public class CfFacadeOrgManagerHandlerBuilder implements HandlerBuilder<OrgManagerIntent>
+import com.engineerbetter.converger.facade.CloudFoundryFacade;
+
+public class CfFacadeOrgManagerHandlerBuilder extends CfFacadeHandlerBuilder<OrgManagerIntent>
 {
+
+	public CfFacadeOrgManagerHandlerBuilder(CloudFoundryFacade cf)
+	{
+		super(cf);
+	}
+
 	@Override
 	public Handler<OrgManagerIntent> build(OrgManagerIntent intent)
 	{
-		return new CfFacadeOrgManagerHandler(intent, null);
+		return new CfFacadeOrgManagerHandler(intent, cf);
 	}
 }

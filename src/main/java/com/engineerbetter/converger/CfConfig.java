@@ -13,6 +13,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import com.engineerbetter.converger.facade.CloudFoundryFacade;
+import com.engineerbetter.converger.facade.ReactorCfClientFacade;
+import com.engineerbetter.converger.facade.ReactorUaaClientFacade;
+import com.engineerbetter.converger.facade.UaaFacade;
+
 @Configuration
 @Profile("!test")
 public class CfConfig
@@ -48,5 +53,17 @@ public class CfConfig
 				.connectionContext(connectionContext)
 				.tokenProvider(tokenProvider)
 				.build();
+	}
+
+	@Bean
+	CloudFoundryFacade cfFacade(CloudFoundryClient cfClient)
+	{
+		return new ReactorCfClientFacade(cfClient);
+	}
+
+	@Bean
+	UaaFacade uaaFacade(UaaClient uaaClient)
+	{
+		return new ReactorUaaClientFacade(uaaClient);
 	}
 }
