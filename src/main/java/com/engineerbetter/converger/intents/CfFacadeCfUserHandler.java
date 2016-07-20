@@ -20,9 +20,9 @@ public class CfFacadeCfUserHandler extends CfUserHandler
 	{
 		Optional<String> userId = intent.uaaUserIntent.getResolution().getId();
 
-		if(userId.isPresent())
+		if(userId.isPresent() && cf.userExists(userId.get()))
 		{
-			// Look up in CF
+			intent.setResolution(IdentifiableResolution.of(userId));
 		}
 		else
 		{
