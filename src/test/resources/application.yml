@@ -1,4 +1,7 @@
 ---
+logging:
+  level:
+    com.engineerbetter: TRACE
 cf:
   host: localhost
   username: admin
