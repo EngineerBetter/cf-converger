@@ -6,11 +6,6 @@ org:
   - dan.young@engineerbetter.com
   spaces:
   - name: DEV
-    user_provided_services:
-    - name: OracleDB
-      credentials:
-        username: sa
-        password: secret
     space_developers:
     - daniel.jones@engineerbetter.com
   - name: PROD
