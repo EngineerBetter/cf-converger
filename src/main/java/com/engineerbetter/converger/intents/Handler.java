@@ -16,6 +16,11 @@ public abstract class Handler<I extends Intent<? extends Resolution>>
 
 	public abstract void converge();
 
+	public String getPlanAction()
+	{
+		return intent.getResolution().convergenceDescription(intent);
+	}
+
 	@Override
 	public int hashCode()
 	{

@@ -4,6 +4,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.net.URI;
+import java.util.List;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -52,7 +54,7 @@ public class UploadIntegrationTest {
 	}
 
 	@Test
-	public void convergesOrg() throws Exception {
+	public void converge() throws Exception {
 		ClassPathResource fixture = new ClassPathResource("fixtures/declaration.yml");
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.add("Content-Type", "application/x-yaml");
@@ -68,5 +70,22 @@ public class UploadIntegrationTest {
 		assertThat(response.getBody(), is("Converged org my-lovely-org"));
 
 		assertThat("my-lovely-org should exist", cfFacade.findOrg("my-lovely-org").isPresent(), is(true));
+	}
+
+	@Test
+	public void plan() throws Exception {
+		ClassPathResource fixture = new ClassPathResource("fixtures/declaration.yml");
+		HttpHeaders requestHeaders = new HttpHeaders();
+		requestHeaders.add("Content-Type", "application/x-yaml");
+		requestHeaders.add("Accept", "application/json");
+
+		URI uri = new URI("http://127.0.0.1:"+port+"/plan");
+		byte[] bytes = new byte[(int)fixture.contentLength()];
+		fixture.getInputStream().read(bytes);
+		RequestEntity<byte[]> postRequest = new RequestEntity<byte[]>(bytes, requestHeaders, HttpMethod.POST, uri);
+
+		ResponseEntity<List<String>> response = rest.exchange(postRequest, new ParameterizedTypeReference<List<String>>(){});
+		assertThat(response.getStatusCode(), is(HttpStatus.OK));
+		assertThat(response.getBody(), hasItem("Would create OrgIntent [name=my-lovely-org]"));
 	}
 }

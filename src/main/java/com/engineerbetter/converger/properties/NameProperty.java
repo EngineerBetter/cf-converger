@@ -41,6 +41,6 @@ public class NameProperty
 	@Override
 	public String toString()
 	{
-		return "Name [name=" + name + "]";
+		return name;
 	}
 }

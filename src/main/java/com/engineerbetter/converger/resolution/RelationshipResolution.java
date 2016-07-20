@@ -1,5 +1,7 @@
 package com.engineerbetter.converger.resolution;
 
+import com.engineerbetter.converger.intents.Intent;
+
 public class RelationshipResolution implements Resolution
 {
 	public static RelationshipResolution of(boolean exists)
@@ -23,6 +25,19 @@ public class RelationshipResolution implements Resolution
 	public boolean exists()
 	{
 		return exists;
+	}
+
+	@Override
+	public String convergenceDescription(Intent<? extends Resolution> intent)
+	{
+		if(exists())
+		{
+			return "Would not create relationship "+intent;
+		}
+		else
+		{
+			return "Would create relationship "+intent;
+		}
 	}
 
 	@Override

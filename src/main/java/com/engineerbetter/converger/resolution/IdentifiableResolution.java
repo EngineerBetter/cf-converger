@@ -2,6 +2,8 @@ package com.engineerbetter.converger.resolution;
 
 import java.util.Optional;
 
+import com.engineerbetter.converger.intents.Intent;
+
 public class IdentifiableResolution implements Resolution
 {
 	private final Optional<String> id;
@@ -20,6 +22,19 @@ public class IdentifiableResolution implements Resolution
 	public boolean exists()
 	{
 		return id.isPresent();
+	}
+
+	@Override
+	public String convergenceDescription(Intent<? extends Resolution> intent)
+	{
+		if(exists())
+		{
+			return "Would not create "+intent;
+		}
+		else
+		{
+			return "Would create "+intent;
+		}
 	}
 
 

@@ -1,5 +1,6 @@
 package com.engineerbetter.converger.http;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ public class IndexController
 	}
 
 	@RequestMapping(method = RequestMethod.POST, value = "/", consumes = "application/x-yaml")
-	public String upload(@RequestBody Declaration declaration) throws Exception
+	public String converge(@RequestBody Declaration declaration) throws Exception
 	{
 		List<Handler<? extends Intent<? extends Resolution>>> handlers = orderedIntentBuilder.getOrderedHandlers(declaration);
 
@@ -47,5 +48,20 @@ public class IndexController
 		}
 
 		return "Converged org "+declaration.org.name;
+	}
+
+	@RequestMapping(method = RequestMethod.POST, value = "/plan", consumes = "application/x-yaml")
+	public List<String> getPlan(@RequestBody Declaration declaration) throws Exception
+	{
+		List<String> actions = new LinkedList<>();
+		List<Handler<? extends Intent<? extends Resolution>>> handlers = orderedIntentBuilder.getOrderedHandlers(declaration);
+
+		for(Handler<? extends Intent<? extends Resolution>> handler : handlers)
+		{
+			handler.resolve();
+			actions.add(handler.getPlanAction());
+		}
+
+		return actions;
 	}
 }
