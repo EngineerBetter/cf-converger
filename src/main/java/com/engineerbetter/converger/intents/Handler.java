@@ -44,4 +44,10 @@ public abstract class Handler<I extends Intent<? extends Resolution>>
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString()
+	{
+		return this.getClass().getSimpleName()+" : " + intent;
+	}
 }
