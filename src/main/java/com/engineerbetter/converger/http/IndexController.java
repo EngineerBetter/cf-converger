@@ -39,6 +39,6 @@ public class IndexController
 		{
 			handler.resolve();
 		}
-		return "b0rk";
+		return "Converged org "+declaration.org.name;
 	}
 }
