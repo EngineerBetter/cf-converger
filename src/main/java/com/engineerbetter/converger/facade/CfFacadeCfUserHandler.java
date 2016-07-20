@@ -1,8 +1,9 @@
-package com.engineerbetter.converger.intents;
+package com.engineerbetter.converger.facade;
 
 import java.util.Optional;
 
-import com.engineerbetter.converger.facade.CloudFoundryFacade;
+import com.engineerbetter.converger.intents.CfUserHandler;
+import com.engineerbetter.converger.intents.CfUserIntent;
 import com.engineerbetter.converger.resolution.IdentifiableResolution;
 
 public class CfFacadeCfUserHandler extends CfUserHandler

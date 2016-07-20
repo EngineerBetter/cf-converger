@@ -1,6 +1,7 @@
-package com.engineerbetter.converger.intents;
+package com.engineerbetter.converger.facade;
 
-import com.engineerbetter.converger.facade.CloudFoundryFacade;
+import com.engineerbetter.converger.intents.CfUserIntent;
+import com.engineerbetter.converger.intents.Handler;
 
 public class CfFacadeCfUserHandlerBuilder extends CfFacadeHandlerBuilder<CfUserIntent>
 {

@@ -1,6 +1,7 @@
-package com.engineerbetter.converger.intents;
+package com.engineerbetter.converger.facade;
 
-import com.engineerbetter.converger.facade.UaaFacade;
+import com.engineerbetter.converger.intents.Handler;
+import com.engineerbetter.converger.intents.UaaUserIntent;
 
 public class UaaFacadeUaaUserHandlerBuilder extends UaaFacadeHandlerBuilder<UaaUserIntent>
 {

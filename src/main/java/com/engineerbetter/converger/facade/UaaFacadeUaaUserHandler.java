@@ -1,6 +1,7 @@
-package com.engineerbetter.converger.intents;
+package com.engineerbetter.converger.facade;
 
-import com.engineerbetter.converger.facade.UaaFacade;
+import com.engineerbetter.converger.intents.UaaUserHandler;
+import com.engineerbetter.converger.intents.UaaUserIntent;
 import com.engineerbetter.converger.resolution.IdentifiableResolution;
 
 public class UaaFacadeUaaUserHandler extends UaaUserHandler

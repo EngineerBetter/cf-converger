@@ -1,8 +1,9 @@
-package com.engineerbetter.converger.intents;
+package com.engineerbetter.converger.facade;
 
 import java.util.Optional;
 
-import com.engineerbetter.converger.facade.CloudFoundryFacade;
+import com.engineerbetter.converger.intents.SpaceHandler;
+import com.engineerbetter.converger.intents.SpaceIntent;
 import com.engineerbetter.converger.resolution.IdentifiableResolution;
 
 public class CfFacadeSpaceHandler extends SpaceHandler

@@ -1,8 +1,9 @@
-package com.engineerbetter.converger.intents;
+package com.engineerbetter.converger.facade;
 
 import java.util.Optional;
 
-import com.engineerbetter.converger.facade.CloudFoundryFacade;
+import com.engineerbetter.converger.intents.OrgManagerHandler;
+import com.engineerbetter.converger.intents.OrgManagerIntent;
 import com.engineerbetter.converger.resolution.RelationshipResolution;
 
 public class CfFacadeOrgManagerHandler extends OrgManagerHandler

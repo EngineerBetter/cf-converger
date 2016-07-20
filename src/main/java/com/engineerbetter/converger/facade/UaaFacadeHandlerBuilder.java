@@ -1,6 +1,7 @@
-package com.engineerbetter.converger.intents;
+package com.engineerbetter.converger.facade;
 
-import com.engineerbetter.converger.facade.UaaFacade;
+import com.engineerbetter.converger.intents.HandlerBuilder;
+import com.engineerbetter.converger.intents.Intent;
 import com.engineerbetter.converger.resolution.Resolution;
 
 public abstract class UaaFacadeHandlerBuilder<I extends Intent<? extends Resolution>> implements HandlerBuilder<I>
