@@ -7,6 +7,8 @@ import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph.CycleFoundException;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.TopologicalOrderIterator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +22,7 @@ import com.engineerbetter.converger.resolution.Resolution;
 @Service
 public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 {
+	private static final Logger logger = LoggerFactory.getLogger(HardcodedOrderedHandlerBuilder.class);
 	private final HandlerFactory handlerFactory;
 
 	@Autowired
@@ -114,7 +117,9 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 
 		List<Handler<? extends Intent<? extends Resolution>>> ordered = new ArrayList<>();
 		while(topOrder.hasNext()) {
-			ordered.add(topOrder.next());
+			Handler<? extends Intent<? extends Resolution>> handler = topOrder.next();
+			ordered.add(handler);
+			logger.debug("Added [{}] to ordered handler list", handler);
 		}
 		return ordered;
 	}
