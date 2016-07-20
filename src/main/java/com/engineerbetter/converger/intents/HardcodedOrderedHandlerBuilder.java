@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 
 import com.engineerbetter.converger.model.Declaration;
 import com.engineerbetter.converger.model.Space;
+import com.engineerbetter.converger.model.Ups;
 import com.engineerbetter.converger.properties.NameProperty;
+import com.engineerbetter.converger.properties.UpsProperties;
 import com.engineerbetter.converger.resolution.Resolution;
 
 @Service
@@ -87,6 +89,12 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 				SpaceDeveloperIntent spaceDeveloperIntent = dedupe(new SpaceDeveloperIntent(spaceIntent, cfUserIntent));
 				addVertexAndEdge(userOrgIntent, spaceDeveloperIntent, dag);
 				addVertexAndEdge(spaceIntent, spaceDeveloperIntent, dag);
+			}
+
+			for(Ups ups : space.upss)
+			{
+				UpsIntent upsIntent = dedupe(new UpsIntent(new UpsProperties(ups.name, ups.credentials), spaceIntent));
+				addVertexAndEdge(spaceIntent, upsIntent, dag);
 			}
 		}
 
