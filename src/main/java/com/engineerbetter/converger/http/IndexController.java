@@ -35,10 +35,17 @@ public class IndexController
 	public String upload(@RequestBody Declaration declaration) throws Exception
 	{
 		List<Handler<? extends Intent<? extends Resolution>>> handlers = orderedIntentBuilder.getOrderedHandlers(declaration);
+
 		for(Handler<? extends Intent<? extends Resolution>> handler : handlers)
 		{
 			handler.resolve();
 		}
+
+		for(Handler<? extends Intent<? extends Resolution>> handler : handlers)
+		{
+			handler.converge();
+		}
+
 		return "Converged org "+declaration.org.name;
 	}
 }

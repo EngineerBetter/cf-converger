@@ -26,6 +26,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
+import com.engineerbetter.converger.facade.CloudFoundryFacade;
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(ConvergerApplication.class)
 @WebIntegrationTest(randomPort=true)
@@ -35,6 +37,8 @@ public class UploadIntegrationTest {
 	private RestTemplate rest = new TestRestTemplate();
 	@Autowired
 	private CloudFoundryClient cfClient;
+	@Autowired
+	private CloudFoundryFacade cfFacade;
 
 	@After
 	public void teardown() {
@@ -48,7 +52,7 @@ public class UploadIntegrationTest {
 	}
 
 	@Test
-	public void triggersConvergence() throws Exception {
+	public void convergesOrg() throws Exception {
 		ClassPathResource fixture = new ClassPathResource("fixtures/declaration.yml");
 		HttpHeaders requestHeaders = new HttpHeaders();
 		requestHeaders.add("Content-Type", "application/x-yaml");
@@ -62,5 +66,7 @@ public class UploadIntegrationTest {
 		ResponseEntity<String> response = rest.exchange(postRequest, String.class);
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 		assertThat(response.getBody(), is("Converged org my-lovely-org"));
+
+		assertThat("my-lovely-org should exist", cfFacade.findOrg("my-lovely-org").isPresent(), is(true));
 	}
 }

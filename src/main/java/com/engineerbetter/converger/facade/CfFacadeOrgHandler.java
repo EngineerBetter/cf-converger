@@ -23,6 +23,10 @@ public class CfFacadeOrgHandler extends OrgHandler
 	@Override
 	public void converge()
 	{
+		if(! intent.getResolution().exists())
+		{
+			cf.createOrg(intent.name.name);
+		}
 	}
 
 }
