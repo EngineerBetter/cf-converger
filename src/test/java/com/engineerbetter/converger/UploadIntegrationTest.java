@@ -49,7 +49,7 @@ public class UploadIntegrationTest {
 		if(response.getResources().size() > 0)
 		{
 			String orgId = response.getResources().get(0).getMetadata().getId();
-			cfClient.organizations().delete(DeleteOrganizationRequest.builder().organizationId(orgId).build()).block();
+			cfClient.organizations().delete(DeleteOrganizationRequest.builder().organizationId(orgId).recursive(true).build()).block();
 		}
 	}
 
@@ -87,5 +87,7 @@ public class UploadIntegrationTest {
 		ResponseEntity<List<String>> response = rest.exchange(postRequest, new ParameterizedTypeReference<List<String>>(){});
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 		assertThat(response.getBody(), hasItem("Would create OrgIntent [name=my-lovely-org]"));
+		assertThat(response.getBody(), hasItem(containsString("Would create SpaceIntent [name=DEV")));
+		assertThat(response.getBody(), hasItem(containsString("Would create SpaceIntent [name=PROD")));
 	}
 }

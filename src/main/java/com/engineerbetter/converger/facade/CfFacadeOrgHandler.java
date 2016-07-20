@@ -25,7 +25,8 @@ public class CfFacadeOrgHandler extends OrgHandler
 	{
 		if(! intent.getResolution().exists())
 		{
-			cf.createOrg(intent.name.name);
+			String orgId = cf.createOrg(intent.name.name);
+			intent.setResolution(IdentifiableResolution.of(orgId));
 		}
 	}
 }

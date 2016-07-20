@@ -35,6 +35,11 @@ public class CfFacadeSpaceHandler extends SpaceHandler
 	@Override
 	public void converge()
 	{
+		if(! intent.getResolution().exists())
+		{
+			String spaceId = cf.createSpace(intent.name.name, intent.orgIntent.getResolution().getId().get());
+			intent.setResolution(IdentifiableResolution.of(spaceId));
+		}
 	}
 
 }

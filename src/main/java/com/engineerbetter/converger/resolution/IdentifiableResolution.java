@@ -73,6 +73,18 @@ public class IdentifiableResolution implements Resolution
 		return new IdentifiableResolution(id);
 	}
 
+	public static IdentifiableResolution of(String id)
+	{
+		if(id == null)
+		{
+			return absent();
+		}
+		else
+		{
+			return new IdentifiableResolution(Optional.of(id));
+		}
+	}
+
 
 	public static IdentifiableResolution absent()
 	{
