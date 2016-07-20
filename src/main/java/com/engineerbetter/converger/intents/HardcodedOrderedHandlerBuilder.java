@@ -129,6 +129,21 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 		return ordered;
 	}
 
+	/**
+	 * Dedupe Intent instances
+	 *
+	 * We want there to only ever be one intent instance for one declaration of intent,
+	 * as otherwise whenever we come across a user of "test@example.com" we'd need the
+	 * handler builder mechanism to keep track of all these references, or we could just
+	 * dedupe after construction.
+	 *
+	 * In an earlier implementation where intents and handlers were not separate, this
+	 * was solved through object equality and that the DAG had Set semantics, and we
+	 * looked up intents via the DAG.
+	 *
+	 * @param intent intent to dedupe
+	 * @return existing instance, if an identical declaration had already been encountered
+	 */
 	@SuppressWarnings("unchecked")
 	private <I extends Intent<? extends Resolution>> I dedupe(I intent)
 	{
