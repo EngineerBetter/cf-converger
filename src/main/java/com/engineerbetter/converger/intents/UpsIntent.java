@@ -1,13 +1,13 @@
 package com.engineerbetter.converger.intents;
 
 import com.engineerbetter.converger.properties.UpsProperties;
-import com.engineerbetter.converger.resolution.MutableResolution;
+import com.engineerbetter.converger.resolution.IdentifiableResolution;
 
-public class UpsIntent implements Intent<MutableResolution>
+public class UpsIntent implements Intent<IdentifiableResolution>
 {
 	public final UpsProperties upsProperties;
 	public final SpaceIntent spaceIntent;
-	private MutableResolution resolution;
+	private IdentifiableResolution resolution;
 
 	public UpsIntent(UpsProperties upsProperties, SpaceIntent spaceIntent)
 	{
@@ -17,14 +17,14 @@ public class UpsIntent implements Intent<MutableResolution>
 
 
 	@Override
-	public MutableResolution getResolution()
+	public IdentifiableResolution getResolution()
 	{
 		return resolution;
 	}
 
 
 	@Override
-	public void setResolution(MutableResolution resolution)
+	public void setResolution(IdentifiableResolution resolution)
 	{
 		this.resolution = resolution;
 	}

@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
@@ -69,7 +70,15 @@ public class UploadIntegrationTest {
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 		assertThat(response.getBody(), is("Converged org my-lovely-org"));
 
-		assertThat("my-lovely-org should exist", cfFacade.findOrg("my-lovely-org").isPresent(), is(true));
+		Optional<String> orgId = cfFacade.findOrg("my-lovely-org");
+		assertThat("my-lovely-org should exist", orgId.isPresent(), is(true));
+
+		Optional<String> devId = cfFacade.findSpace("DEV", orgId.get());
+		assertThat("DEV should exist", devId.isPresent(), is(true));
+
+		assertThat("OracleDB should exist", cfFacade.findUps("OracleDB", devId.get()).isPresent(), is(true));
+
+		assertThat("PROD should exist", cfFacade.findSpace("PROD", orgId.get()).isPresent(), is(true));
 	}
 
 	@Test
@@ -85,9 +94,9 @@ public class UploadIntegrationTest {
 		RequestEntity<byte[]> postRequest = new RequestEntity<byte[]>(bytes, requestHeaders, HttpMethod.POST, uri);
 
 		ResponseEntity<List<String>> response = rest.exchange(postRequest, new ParameterizedTypeReference<List<String>>(){});
-		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 		assertThat(response.getBody(), hasItem("Would create OrgIntent [name=my-lovely-org]"));
 		assertThat(response.getBody(), hasItem(containsString("Would create SpaceIntent [name=DEV")));
 		assertThat(response.getBody(), hasItem(containsString("Would create SpaceIntent [name=PROD")));
+		assertThat(response.getBody(), hasItem(containsString("Would create UpsIntent [upsProperties=UpsProperties [name=OracleDB, credentials={username=sa, password=secret}]")));
 	}
 }

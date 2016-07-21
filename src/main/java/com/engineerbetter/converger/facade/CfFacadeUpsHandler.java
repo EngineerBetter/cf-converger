@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.engineerbetter.converger.intents.UpsHandler;
 import com.engineerbetter.converger.intents.UpsIntent;
+import com.engineerbetter.converger.resolution.IdentifiableResolution;
 
 public class CfFacadeUpsHandler extends UpsHandler
 {
@@ -23,13 +24,24 @@ public class CfFacadeUpsHandler extends UpsHandler
 
 		if(spaceId.isPresent())
 		{
-			cf.findUps(intent.upsProperties.name, spaceId.get());
+			Optional<String> upsId = cf.findUps(intent.upsProperties.name, spaceId.get());
+			intent.setResolution(IdentifiableResolution.of(upsId));
+		}
+		else
+		{
+			intent.setResolution(IdentifiableResolution.absent());
 		}
 	}
 
 	@Override
 	public void converge()
 	{
+		if(! intent.getResolution().exists())
+		{
+			String spaceId = intent.spaceIntent.getResolution().getId().get();
+			String upsId = cf.createUps(intent.upsProperties.name, intent.upsProperties.credentials, spaceId);
+			intent.setResolution(IdentifiableResolution.of(upsId));
+		}
 	}
 
 }
