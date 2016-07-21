@@ -3,6 +3,7 @@ package com.engineerbetter.converger.facade;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
@@ -30,12 +31,17 @@ import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.DeleteUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.engineerbetter.converger.properties.UpsProperties;
 
 public class ReactorCfClientFacade implements CloudFoundryFacade
 {
@@ -116,6 +122,15 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	{
 		CreateUserProvidedServiceInstanceResponse response = cf.userProvidedServiceInstances().create(CreateUserProvidedServiceInstanceRequest.builder().name(name).credentials(credentials).spaceId(spaceId).build()).block();
 		return response.getMetadata().getId();
+	}
+
+	@Override
+	public UpsProperties getUps(String id)
+	{
+		GetUserProvidedServiceInstanceResponse response = cf.userProvidedServiceInstances().get(GetUserProvidedServiceInstanceRequest.builder().userProvidedServiceInstanceId(id).build()).block();
+		UserProvidedServiceInstanceEntity entity = response.getEntity();
+		Map<String, Object> entityCredentials = entity.getCredentials();
+		return new UpsProperties(entity.getName(), entityCredentials.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString())));
 	}
 
 	@Override
