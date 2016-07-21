@@ -67,6 +67,16 @@ public class CfFacadeUpsHandlerTest
 
 
 	@Test
+	public void resolvedAsDifferent()
+	{
+		spaceIntent.setResolution(IdentifiableResolution.of("space-id"));
+		when(cf.findUps("upsName", "space-id")).thenReturn(Optional.<String>of("ups-id"));
+		handler.resolve();
+		assertThat(intent.getResolution(), is(IdentifiableResolution.of("ups-id")));
+	}
+
+
+	@Test
 	public void convergeCreatesWhenAbsent()
 	{
 		spaceIntent.setResolution(IdentifiableResolution.of("space-id"));

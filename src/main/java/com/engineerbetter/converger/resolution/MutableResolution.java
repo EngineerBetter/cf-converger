@@ -2,12 +2,18 @@ package com.engineerbetter.converger.resolution;
 
 import java.util.Optional;
 
-public abstract class MutableResolution extends IdentifiableResolution
+public interface MutableResolution extends IdentifiableResolution
 {
-	protected MutableResolution(Optional<String> id)
+	Optional<Difference> getDifference();
+
+	public static MutableResolution absent()
 	{
-		super(id);
+		return new ConcreteMutableResolution(Optional.empty(), Optional.empty());
 	}
 
-	public abstract Optional<Difference> getDifference();
+
+	public static MutableResolution same(String id)
+	{
+		return new ConcreteMutableResolution(Optional.of(id), Optional.empty());
+	}
 }

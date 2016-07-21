@@ -2,76 +2,15 @@ package com.engineerbetter.converger.resolution;
 
 import java.util.Optional;
 
-import com.engineerbetter.converger.intents.Intent;
-
-public class IdentifiableResolution implements Resolution
+public interface IdentifiableResolution extends Resolution
 {
-	private final Optional<String> id;
-
-	protected IdentifiableResolution(Optional<String> id)
-	{
-		this.id = id;
-	}
-
-	public Optional<String> getId()
-	{
-		return id;
-	}
-
-	@Override
-	public boolean exists()
-	{
-		return id.isPresent();
-	}
-
-	@Override
-	public String convergenceDescription(Intent<? extends Resolution> intent)
-	{
-		if(exists())
-		{
-			return "Would not create "+intent;
-		}
-		else
-		{
-			return "Would create "+intent;
-		}
-	}
-
-
-	@Override
-	public int hashCode()
-	{
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-
-
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		IdentifiableResolution other = (IdentifiableResolution) obj;
-		if (id == null)
-		{
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
+	Optional<String> getId();
 
 	public static IdentifiableResolution of(Optional<String> id)
 	{
-		return new IdentifiableResolution(id);
+		return new ConcreteIdentifiableResolution(id);
 	}
+
 
 	public static IdentifiableResolution of(String id)
 	{
@@ -81,13 +20,13 @@ public class IdentifiableResolution implements Resolution
 		}
 		else
 		{
-			return new IdentifiableResolution(Optional.of(id));
+			return new ConcreteIdentifiableResolution(Optional.of(id));
 		}
 	}
 
 
 	public static IdentifiableResolution absent()
 	{
-		return new IdentifiableResolution(Optional.empty());
+		return new ConcreteIdentifiableResolution(Optional.empty());
 	}
 }
