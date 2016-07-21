@@ -10,7 +10,10 @@ import java.util.UUID;
 
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.DefaultConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -75,6 +78,12 @@ public class ReactorCfClientFacadeIntegrationTest
 		String id = facade.createUps("test-ups", credentials, spaceId);
 		assertThat(cfClient.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name("test-ups").build()).block().getResources().size(), is(1));
 		assertThat(facade.findUps("test-ups", spaceId), is(Optional.of(id)));
+
+		GetUserProvidedServiceInstanceResponse response = cfClient.userProvidedServiceInstances().get(GetUserProvidedServiceInstanceRequest.builder().userProvidedServiceInstanceId(id).build()).block();
+		UserProvidedServiceInstanceEntity entity = response.getEntity();
+		assertThat(entity.getName(), equalTo("test-ups"));
+		assertThat(entity.getCredentials(), equalTo(credentials));
+
 		facade.deleteUps(id);
 		assertThat(cfClient.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name("test-ups").build()).block().getResources().size(), is(0));
 	}
