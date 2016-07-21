@@ -72,15 +72,16 @@ public class CfFacadeUpsHandlerTest
 		spaceIntent.setResolution(IdentifiableResolution.of("space-id"));
 		intent.setResolution(IdentifiableResolution.absent());
 		handler.converge();
-		verify(cf).createUps("upsName", upsCredentials, "space-id");
+		verify(cf).createUps(new UpsProperties("upsName", upsCredentials), "space-id");
 	}
 
 
-	@Test public void convergeNoopsWhenPresent()
+	@Test
+	public void convergeNoopsWhenPresent()
 	{
 		spaceIntent.setResolution(IdentifiableResolution.of("space-id"));
 		intent.setResolution(IdentifiableResolution.of("ups-id"));
 		handler.converge();
-		verify(cf, times(0)).createUps(any(), any(), any());
+		verify(cf, times(0)).createUps(any(), any());
 	}
 }

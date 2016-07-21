@@ -118,9 +118,9 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	}
 
 	@Override
-	public String createUps(String name, Map<String, String> credentials, String spaceId)
+	public String createUps(UpsProperties properties, String spaceId)
 	{
-		CreateUserProvidedServiceInstanceResponse response = cf.userProvidedServiceInstances().create(CreateUserProvidedServiceInstanceRequest.builder().name(name).credentials(credentials).spaceId(spaceId).build()).block();
+		CreateUserProvidedServiceInstanceResponse response = cf.userProvidedServiceInstances().create(CreateUserProvidedServiceInstanceRequest.builder().name(properties.name).credentials(properties.credentials).spaceId(spaceId).build()).block();
 		return response.getMetadata().getId();
 	}
 

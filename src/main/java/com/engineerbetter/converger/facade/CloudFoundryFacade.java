@@ -1,6 +1,5 @@
 package com.engineerbetter.converger.facade;
 
-import java.util.Map;
 import java.util.Optional;
 
 import com.engineerbetter.converger.properties.UpsProperties;
@@ -30,7 +29,7 @@ public interface CloudFoundryFacade
 	void deleteSpace(String id);
 
 	Optional<String> findUps(String name, String spaceId);
-	String createUps(String name, Map<String, String> credentials, String spaceId);
+	String createUps(UpsProperties properties, String spaceId);
 	UpsProperties getUps(String id);
 	void deleteUps(String id);
 

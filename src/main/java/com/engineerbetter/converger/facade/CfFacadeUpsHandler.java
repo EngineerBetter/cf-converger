@@ -39,7 +39,7 @@ public class CfFacadeUpsHandler extends UpsHandler
 		if(! intent.getResolution().exists())
 		{
 			String spaceId = intent.spaceIntent.getResolution().getId().get();
-			String upsId = cf.createUps(intent.upsProperties.name, intent.upsProperties.credentials, spaceId);
+			String upsId = cf.createUps(intent.upsProperties, spaceId);
 			intent.setResolution(IdentifiableResolution.of(upsId));
 		}
 	}
