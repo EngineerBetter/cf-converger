@@ -8,6 +8,25 @@ class ConcreteIdentifiableResolution implements IdentifiableResolution
 {
 	private final Optional<String> id;
 
+
+	protected ConcreteIdentifiableResolution()
+	{
+		this.id = Optional.empty();
+	}
+
+
+	protected ConcreteIdentifiableResolution(String id)
+	{
+		if(id != null)
+		{
+			this.id = Optional.of(id);
+		}
+		else
+		{
+			this.id = Optional.empty();
+		}
+	}
+
 	protected ConcreteIdentifiableResolution(Optional<String> id)
 	{
 		if(id != null)

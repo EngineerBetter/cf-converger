@@ -4,7 +4,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.cloudfoundry.client.CloudFoundryClient;
@@ -30,6 +32,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
 import com.engineerbetter.converger.facade.CloudFoundryFacade;
+import com.engineerbetter.converger.properties.UpsProperties;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(ConvergerApplication.class)
@@ -93,10 +96,18 @@ public class UploadIntegrationTest {
 		fixture.getInputStream().read(bytes);
 		RequestEntity<byte[]> postRequest = new RequestEntity<byte[]>(bytes, requestHeaders, HttpMethod.POST, uri);
 
+		String orgId = cfFacade.createOrg("my-lovely-org");
+		String prodId = cfFacade.createSpace("DEV", orgId);
+		Map<String, String> credentials = new HashMap<>();
+		credentials.put("username", "sa");
+		credentials.put("password", "oldpassword");
+		UpsProperties upsProperties = new UpsProperties("OracleDB", credentials);
+		cfFacade.createUps(upsProperties, prodId);
+
 		ResponseEntity<List<String>> response = rest.exchange(postRequest, new ParameterizedTypeReference<List<String>>(){});
-		assertThat(response.getBody(), hasItem("Would create OrgIntent [name=my-lovely-org]"));
-		assertThat(response.getBody(), hasItem(containsString("Would create SpaceIntent [name=DEV")));
+		assertThat(response.getBody(), hasItem("Would not create OrgIntent [name=my-lovely-org]"));
+		assertThat(response.getBody(), hasItem(containsString("Would not create SpaceIntent [name=DEV")));
 		assertThat(response.getBody(), hasItem(containsString("Would create SpaceIntent [name=PROD")));
-		assertThat(response.getBody(), hasItem(containsString("Would create UpsIntent [upsProperties=UpsProperties [name=OracleDB, credentials={username=sa, password=secret}]")));
+		assertThat(response.getBody(), hasItem(containsString("Would update UpsIntent, changing entry password from oldpassword to secret in credentials")));
 	}
 }

@@ -1,5 +1,6 @@
 package com.engineerbetter.converger.properties;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class UpsProperties
@@ -10,7 +11,7 @@ public class UpsProperties
 	public UpsProperties(String name, Map<String, String> credentials)
 	{
 		this.name = name;
-		this.credentials = credentials;
+		this.credentials = Collections.unmodifiableMap(credentials);
 	}
 
 	@Override
