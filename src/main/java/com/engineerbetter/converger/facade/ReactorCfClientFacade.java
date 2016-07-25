@@ -35,6 +35,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedSe
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.GetUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesResponse;
+import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.ListUsersResponse;
@@ -131,6 +132,19 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		UserProvidedServiceInstanceEntity entity = response.getEntity();
 		Map<String, Object> entityCredentials = entity.getCredentials();
 		return new UpsProperties(entity.getName(), entityCredentials.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString())));
+	}
+
+	@Override
+	public void updateUps(UpsProperties properties, String spaceId)
+	{
+		Optional<String> id = findUps(properties.name, spaceId);
+
+		if(!id.isPresent())
+		{
+			throw new RuntimeException("UPS not found");
+		}
+
+		cf.userProvidedServiceInstances().update(UpdateUserProvidedServiceInstanceRequest.builder().credentials(properties.credentials).userProvidedServiceInstanceId(id.get()).build()).block();
 	}
 
 	@Override

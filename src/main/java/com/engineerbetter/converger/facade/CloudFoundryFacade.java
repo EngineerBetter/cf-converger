@@ -31,6 +31,7 @@ public interface CloudFoundryFacade
 	Optional<String> findUps(String name, String spaceId);
 	String createUps(UpsProperties properties, String spaceId);
 	UpsProperties getUps(String id);
+	void updateUps(UpsProperties properties, String spaceId);
 	void deleteUps(String id);
 
 	boolean userExists(String id);

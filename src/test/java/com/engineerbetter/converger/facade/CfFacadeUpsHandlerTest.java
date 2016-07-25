@@ -2,6 +2,7 @@ package com.engineerbetter.converger.facade;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
@@ -118,5 +119,24 @@ public class CfFacadeUpsHandlerTest
 		intent.setResolution(MutableResolution.same("ups-id"));
 		handler.converge();
 		verify(cf, times(0)).createUps(any(), any());
+	}
+
+
+	@Test
+	public void convergeUpdatesWhenDifferent()
+	{
+		spaceIntent.setResolution(IdentifiableResolution.of("space-id"));
+		Map<String, String> actualCredentials = new HashMap<>();
+		actualCredentials.put("username", "admin");
+		actualCredentials.put("password", "passw0rd");
+		UpsProperties observed = new UpsProperties("upsName", actualCredentials);
+
+		given(cf.findUps("upsName", "space-id")).willReturn(Optional.<String>of("ups-id"));
+		given(cf.getUps("ups-id")).willReturn(observed);
+
+		handler.resolve();
+		handler.converge();
+
+		then(cf).should().updateUps(intent.upsProperties, "space-id");
 	}
 }

@@ -14,6 +14,7 @@ import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,19 @@ public class UploadIntegrationTest {
 	private CloudFoundryClient cfClient;
 	@Autowired
 	private CloudFoundryFacade cfFacade;
+
+	@Before
+	public void setup()
+	{
+		String orgId = cfFacade.createOrg("my-lovely-org");
+		String prodId = cfFacade.createSpace("DEV", orgId);
+		Map<String, String> credentials = new HashMap<>();
+		credentials.put("username", "sa");
+		credentials.put("password", "oldpassword");
+		credentials.put("secret", "notneeded");
+		UpsProperties upsProperties = new UpsProperties("OracleDB", credentials);
+		cfFacade.createUps(upsProperties, prodId);
+	}
 
 	@After
 	public void teardown() {
@@ -79,7 +93,13 @@ public class UploadIntegrationTest {
 		Optional<String> devId = cfFacade.findSpace("DEV", orgId.get());
 		assertThat("DEV should exist", devId.isPresent(), is(true));
 
-		assertThat("OracleDB should exist", cfFacade.findUps("OracleDB", devId.get()).isPresent(), is(true));
+		Optional<String> oracleDbId = cfFacade.findUps("OracleDB", devId.get());
+		assertThat("OracleDB should exist", oracleDbId.isPresent(), is(true));
+		Map<String, String> credentials = new HashMap<>();
+		credentials.put("username", "sa");
+		credentials.put("password", "secret");
+		UpsProperties oracleDb = new UpsProperties("OracleDB", credentials);
+		assertThat("OracleDB should have been updated", cfFacade.getUps(oracleDbId.get()), equalTo(oracleDb));
 
 		assertThat("PROD should exist", cfFacade.findSpace("PROD", orgId.get()).isPresent(), is(true));
 	}
@@ -95,15 +115,6 @@ public class UploadIntegrationTest {
 		byte[] bytes = new byte[(int)fixture.contentLength()];
 		fixture.getInputStream().read(bytes);
 		RequestEntity<byte[]> postRequest = new RequestEntity<byte[]>(bytes, requestHeaders, HttpMethod.POST, uri);
-
-		String orgId = cfFacade.createOrg("my-lovely-org");
-		String prodId = cfFacade.createSpace("DEV", orgId);
-		Map<String, String> credentials = new HashMap<>();
-		credentials.put("username", "sa");
-		credentials.put("password", "oldpassword");
-		credentials.put("secret", "notneeded");
-		UpsProperties upsProperties = new UpsProperties("OracleDB", credentials);
-		cfFacade.createUps(upsProperties, prodId);
 
 		ResponseEntity<List<String>> response = rest.exchange(postRequest, new ParameterizedTypeReference<List<String>>(){});
 		assertThat(response.getBody(), hasItem("Would not create OrgIntent [name=my-lovely-org]"));

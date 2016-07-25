@@ -82,6 +82,15 @@ public class ReactorCfClientFacadeIntegrationTest
 		assertThat(facade.findUps("test-ups", spaceId), is(Optional.of(id)));
 		assertThat(facade.getUps(id), equalTo(upsProperties));
 
+		// Update
+		Map<String, String> newCredentials = new HashMap<>();
+		credentials.put("username", "sa");
+		credentials.put("password", "blank");
+		UpsProperties newProperties = new UpsProperties("test-ups", newCredentials);
+		facade.updateUps(newProperties, spaceId);
+
+		assertThat(facade.getUps(id), equalTo(newProperties));
+
 		facade.deleteUps(id);
 		assertThat(cfClient.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name("test-ups").build()).block().getResources().size(), is(0));
 	}

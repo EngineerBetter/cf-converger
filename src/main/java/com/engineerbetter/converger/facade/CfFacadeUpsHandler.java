@@ -65,6 +65,11 @@ public class CfFacadeUpsHandler extends UpsHandler
 			String upsId = cf.createUps(intent.upsProperties, spaceId);
 			intent.setResolution(MutableResolution.same(upsId));
 		}
+		else if(intent.getResolution().hasDifferences())
+		{
+			String spaceId = intent.spaceIntent.getResolution().getId().get();
+			cf.updateUps(intent.upsProperties, spaceId);
+		}
 	}
 
 }
