@@ -101,6 +101,7 @@ public class UploadIntegrationTest {
 		Map<String, String> credentials = new HashMap<>();
 		credentials.put("username", "sa");
 		credentials.put("password", "oldpassword");
+		credentials.put("secret", "notneeded");
 		UpsProperties upsProperties = new UpsProperties("OracleDB", credentials);
 		cfFacade.createUps(upsProperties, prodId);
 
@@ -108,6 +109,6 @@ public class UploadIntegrationTest {
 		assertThat(response.getBody(), hasItem("Would not create OrgIntent [name=my-lovely-org]"));
 		assertThat(response.getBody(), hasItem(containsString("Would not create SpaceIntent [name=DEV")));
 		assertThat(response.getBody(), hasItem(containsString("Would create SpaceIntent [name=PROD")));
-		assertThat(response.getBody(), hasItem(containsString("Would update UpsIntent, changing entry password from oldpassword to secret in credentials")));
+		assertThat(response.getBody(), hasItem(containsString("Would update UpsIntent, changing entry password from oldpassword to secret in credentials, and removing entry secret->notneeded from credentials")));
 	}
 }

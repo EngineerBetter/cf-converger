@@ -1,5 +1,6 @@
 package com.engineerbetter.converger.resolution;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,30 +91,11 @@ class ConcreteMutableResolution extends ConcreteIdentifiableResolution implement
 				{
 					if(difference instanceof ValueChange)
 					{
-						ValueChange valueDiff = (ValueChange) difference;
-						builder.append("changing "+valueDiff.getPropertyName()+" from "+valueDiff.getLeft()+" to "+valueDiff.getRight());
+						builder.append(getMessage((ValueChange) difference));
 					}
 					else if (difference instanceof MapChange)
 					{
-						MapChange mapChange = (MapChange) difference;
-						for(EntryChange entryChange : mapChange.getEntryChanges())
-						{
-							if(entryChange instanceof EntryAdded)
-							{
-								EntryAdded added = (EntryAdded) entryChange;
-								builder.append("adding entry "+added.getKey()+"->"+added.getValue()+" to "+mapChange.getPropertyName());
-							}
-							else if(entryChange instanceof EntryRemoved)
-							{
-								EntryRemoved removed = (EntryRemoved) entryChange;
-								builder.append("removing entry "+removed.getKey()+"->"+removed.getValue()+" from "+mapChange.getPropertyName());
-							}
-							else if(entryChange instanceof EntryValueChange)
-							{
-								EntryValueChange changed = (EntryValueChange) entryChange;
-								builder.append("changing entry "+changed.getKey()+ " from "+changed.getLeftValue()+" to "+changed.getRightValue()+" in "+mapChange.getPropertyName());
-							}
-						}
+						getMapChangeMessage((MapChange) difference, builder);
 					}
 				}
 				return "Would update "+intent.getClass().getSimpleName()+", "+builder.toString();
@@ -123,5 +105,55 @@ class ConcreteMutableResolution extends ConcreteIdentifiableResolution implement
 		{
 			return "Would create "+intent;
 		}
+	}
+
+
+	private String getMessage(ValueChange changed)
+	{
+		return "changing "+changed.getPropertyName()+" from "+changed.getLeft()+" to "+changed.getRight();
+	}
+
+
+	private void getMapChangeMessage(MapChange mapChange, StringBuilder builder)
+	{
+		Iterator<EntryChange> changesIterator = mapChange.getEntryChanges().iterator();
+		while(changesIterator.hasNext())
+		{
+			EntryChange entryChange = changesIterator.next();
+
+			if(entryChange instanceof EntryAdded)
+			{
+				builder.append(getMessage(mapChange, (EntryAdded) entryChange));
+			}
+			else if(entryChange instanceof EntryRemoved)
+			{
+				builder.append(getMessage(mapChange, (EntryRemoved) entryChange));
+			}
+			else if(entryChange instanceof EntryValueChange)
+			{
+				builder.append(getMessage(mapChange, (EntryValueChange) entryChange));
+			}
+
+			if(changesIterator.hasNext())
+			{
+				builder.append(", and ");
+			}
+		}
+	}
+
+
+	private String getMessage(MapChange mapChange, EntryAdded added)
+	{
+		return "adding entry "+added.getKey()+"->"+added.getValue()+" to "+mapChange.getPropertyName();
+	}
+
+	private String getMessage(MapChange mapChange, EntryRemoved removed)
+	{
+		return "removing entry "+removed.getKey()+"->"+removed.getValue()+" from "+mapChange.getPropertyName();
+	}
+
+	private String getMessage(MapChange mapChange, EntryValueChange changed)
+	{
+		return "changing entry "+changed.getKey()+ " from "+changed.getLeftValue()+" to "+changed.getRightValue()+" in "+mapChange.getPropertyName();
 	}
 }
