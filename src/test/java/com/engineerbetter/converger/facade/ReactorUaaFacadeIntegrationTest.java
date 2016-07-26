@@ -39,10 +39,20 @@ public class ReactorUaaFacadeIntegrationTest
 
 
 	@Test
-	public void usersFindableByName()
+	public void usersManagement()
 	{
 		Optional<String> id = uaa.findUser(System.getenv("CF_USERNAME"));
 		assertThat("User used to run tests should exist in the UAA", id.isPresent(), is(true));
 		assertThat(id.get(), not(""));
+
+		String createdId = uaa.createUser("cf-converger-test-user");
+		assertThat(createdId, notNullValue());
+		Optional<String> foundId = uaa.findUser("cf-converger-test-user");
+		assertThat("User that test created should be findable", foundId.isPresent(), is(true));
+
+		uaa.deleteUser(foundId.get());
+
+		foundId = uaa.findUser("cf-converger-test-user");
+		assertThat("User that test deleted should not be findable", foundId.isPresent(), is(false));
 	}
 }

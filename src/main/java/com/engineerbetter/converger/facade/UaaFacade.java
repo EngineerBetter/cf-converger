@@ -4,9 +4,9 @@ import java.util.Optional;
 
 public interface UaaFacade
 {
-	Optional<String> findUser(String username);
+	Optional<String> findUser(String email);
 
-	String createUser(String username);
+	String createUser(String email);
 
-	void deleteUser();
+	void deleteUser(String userId);
 }
