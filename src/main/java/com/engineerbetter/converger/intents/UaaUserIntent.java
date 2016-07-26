@@ -1,16 +1,16 @@
 package com.engineerbetter.converger.intents;
 
-import com.engineerbetter.converger.properties.NameProperty;
+import com.engineerbetter.converger.properties.UaaUserProperties;
 import com.engineerbetter.converger.resolution.IdentifiableResolution;
 
 public class UaaUserIntent implements Intent<IdentifiableResolution>
 {
-	public final NameProperty name;
+	public final UaaUserProperties properties;
 	private IdentifiableResolution resolution;
 
-	public UaaUserIntent(NameProperty name)
+	public UaaUserIntent(UaaUserProperties properties)
 	{
-		this.name = name;
+		this.properties = properties;
 	}
 
 
@@ -33,9 +33,11 @@ public class UaaUserIntent implements Intent<IdentifiableResolution>
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
+				+ ((properties == null) ? 0 : properties.hashCode());
 		return result;
 	}
+
 
 	@Override
 	public boolean equals(Object obj)
@@ -47,18 +49,19 @@ public class UaaUserIntent implements Intent<IdentifiableResolution>
 		if (getClass() != obj.getClass())
 			return false;
 		UaaUserIntent other = (UaaUserIntent) obj;
-		if (name == null)
+		if (properties == null)
 		{
-			if (other.name != null)
+			if (other.properties != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!properties.equals(other.properties))
 			return false;
 		return true;
 	}
 
+
 	@Override
 	public String toString()
 	{
-		return "UaaUserIntent [name=" + name + "]";
+		return "UaaUserIntent [properties=" + properties + "]";
 	}
 }

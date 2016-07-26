@@ -18,7 +18,7 @@ public class UaaFacadeUaaUserHandler extends UaaUserHandler
 	@Override
 	public void resolve()
 	{
-		intent.setResolution(IdentifiableResolution.of(uaa.findUser(intent.name.name)));
+		intent.setResolution(IdentifiableResolution.of(uaa.findUser(intent.properties.email)));
 	}
 
 

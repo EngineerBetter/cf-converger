@@ -16,8 +16,10 @@ import org.springframework.stereotype.Service;
 
 import com.engineerbetter.converger.model.Declaration;
 import com.engineerbetter.converger.model.Space;
+import com.engineerbetter.converger.model.UaaUser;
 import com.engineerbetter.converger.model.Ups;
 import com.engineerbetter.converger.properties.NameProperty;
+import com.engineerbetter.converger.properties.UaaUserProperties;
 import com.engineerbetter.converger.properties.UpsProperties;
 import com.engineerbetter.converger.resolution.Resolution;
 
@@ -53,13 +55,29 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 	private DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> buildGraph(Declaration declaration) throws CycleFoundException
 	{
 		DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag = new DirectedAcyclicGraph<>(DefaultEdge.class);
+
+		/*
+		 * This smells awful.
+		 *
+		 * We want to define UaaUsers with all their properties once, but then be able to fetch the whole intent just by email later on in the
+		 * YAML. Wanging stuff in a map doesn't seem scalable, and surely the YAML itself serves as this lookup map? Just looking up by path
+		 * rather than scalar ID? Something to think about when we change to a treecrawl.
+		 */
+		Map<String, UaaUserIntent> uaaUserIntents = new HashMap<>();
+		for(UaaUser user : declaration.uaaUsers)
+		{
+			UaaUserIntent uaaUserIntent = dedupe(new UaaUserIntent(new UaaUserProperties(user.email, user.givenName, user.familyName)));
+			uaaUserIntents.put(user.email, uaaUserIntent);
+		}
+
+
 		OrgIntent orgIntent = dedupe(new OrgIntent(new NameProperty(declaration.org.name)));
 		Handler<OrgIntent> orgHandler = handlerFactory.build(orgIntent);
 		dag.addVertex(orgHandler);
 
 		for(String manager : declaration.org.managers)
 		{
-			UaaUserIntent uaaUserIntent = dedupe(new UaaUserIntent(new NameProperty(manager)));
+			UaaUserIntent uaaUserIntent = uaaUserIntents.get(manager);
 			addVertex(uaaUserIntent, dag);
 			CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
 			addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);
@@ -78,7 +96,7 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 			for(String developer : space.developers)
 			{
 				// Multiple returns would have made this easier to DRY out!
-				UaaUserIntent uaaUserIntent = dedupe(new UaaUserIntent(new NameProperty(developer)));
+				UaaUserIntent uaaUserIntent = uaaUserIntents.get(developer);
 				addVertex(uaaUserIntent, dag);
 				CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
 				addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);

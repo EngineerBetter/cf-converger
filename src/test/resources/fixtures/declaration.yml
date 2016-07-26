@@ -1,5 +1,12 @@
 ---
-schema_version: 1
+schema_version: 2
+uaa:
+- email: dan.young@engineerbetter.com
+  givenName: Dan
+  familyName: Young
+- email: daniel.jones@engineerbetter.com
+  givenName: Daniel
+  familyName: Jones
 org:
   name: my-lovely-org
   org_managers:

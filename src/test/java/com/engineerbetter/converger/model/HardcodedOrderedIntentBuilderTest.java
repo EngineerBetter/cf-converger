@@ -35,6 +35,7 @@ import com.engineerbetter.converger.intents.UaaUserIntent;
 import com.engineerbetter.converger.intents.UpsIntent;
 import com.engineerbetter.converger.intents.UserOrgIntent;
 import com.engineerbetter.converger.properties.NameProperty;
+import com.engineerbetter.converger.properties.UaaUserProperties;
 import com.engineerbetter.converger.resolution.Resolution;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -82,9 +83,9 @@ public class HardcodedOrderedIntentBuilderTest
 		assertThisAppearsBeforeThat(orgHandler, devSpaceHandler, handlers);
 		assertThisAppearsBeforeThat(orgHandler, prodSpaceHandler, handlers);
 
-		UaaUserIntent uaaDanYoung = new UaaUserIntent(new NameProperty("dan.young@engineerbetter.com"));
+		UaaUserIntent uaaDanYoung = new UaaUserIntent(new UaaUserProperties("dan.young@engineerbetter.com", "Dan", "Young"));
 		Handler<UaaUserIntent> uaaDanYoungHandler = handlerFactory.build(uaaDanYoung);
-		UaaUserIntent uaaDanJones = new UaaUserIntent(new NameProperty("daniel.jones@engineerbetter.com"));
+		UaaUserIntent uaaDanJones = new UaaUserIntent(new UaaUserProperties("daniel.jones@engineerbetter.com", "Daniel", "Jones"));
 		Handler<UaaUserIntent> uaaDanJonesHandler = handlerFactory.build(uaaDanJones);
 
 		CfUserIntent cfDanYoung = new CfUserIntent(uaaDanYoung);
