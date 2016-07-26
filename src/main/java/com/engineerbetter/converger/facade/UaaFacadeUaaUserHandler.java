@@ -25,5 +25,10 @@ public class UaaFacadeUaaUserHandler extends UaaUserHandler
 	@Override
 	public void converge()
 	{
+		if(! intent.getResolution().exists())
+		{
+			String id = uaa.createUser(intent.properties);
+			intent.setResolution(IdentifiableResolution.of(id));
+		}
 	}
 }
