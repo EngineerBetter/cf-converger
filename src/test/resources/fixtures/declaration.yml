@@ -1,16 +1,16 @@
 ---
 schema_version: 2
 uaa:
-- email: dan.young@engineerbetter.com
+- email: dan.young@example.com
   givenName: Dan
   familyName: Young
-- email: daniel.jones@engineerbetter.com
+- email: daniel.jones@example.com
   givenName: Daniel
   familyName: Jones
 org:
   name: my-lovely-org
   org_managers:
-  - dan.young@engineerbetter.com
+  - dan.young@example.com
   spaces:
   - name: DEV
     user_provided_services:
@@ -19,7 +19,7 @@ org:
         username: sa
         password: secret
     space_developers:
-    - daniel.jones@engineerbetter.com
+    - daniel.jones@example.com
   - name: PROD
     space_developers:
-    - daniel.jones@engineerbetter.com
+    - daniel.jones@example.com

@@ -33,6 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
 import com.engineerbetter.converger.facade.CloudFoundryFacade;
+import com.engineerbetter.converger.facade.UaaFacade;
 import com.engineerbetter.converger.properties.UpsProperties;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -46,6 +47,8 @@ public class UploadIntegrationTest {
 	private CloudFoundryClient cfClient;
 	@Autowired
 	private CloudFoundryFacade cfFacade;
+	@Autowired
+	private UaaFacade uaaFacade;
 
 	@Before
 	public void setup()
@@ -69,6 +72,9 @@ public class UploadIntegrationTest {
 			String orgId = response.getResources().get(0).getMetadata().getId();
 			cfClient.organizations().delete(DeleteOrganizationRequest.builder().organizationId(orgId).recursive(true).build()).block();
 		}
+
+		deleteUser("dan.young@example.com");
+		deleteUser("daniel.jones@example.com");
 	}
 
 	@Test
@@ -86,6 +92,9 @@ public class UploadIntegrationTest {
 		ResponseEntity<String> response = rest.exchange(postRequest, String.class);
 		assertThat(response.getStatusCode(), is(HttpStatus.OK));
 		assertThat(response.getBody(), is("Converged org my-lovely-org"));
+
+		Optional<String> dyId = uaaFacade.findUser("dan.young@example.com");
+		assertThat("dan.young@example.com should exist in UAA", dyId.isPresent(), is(true));
 
 		Optional<String> orgId = cfFacade.findOrg("my-lovely-org");
 		assertThat("my-lovely-org should exist", orgId.isPresent(), is(true));
@@ -117,9 +126,19 @@ public class UploadIntegrationTest {
 		RequestEntity<byte[]> postRequest = new RequestEntity<byte[]>(bytes, requestHeaders, HttpMethod.POST, uri);
 
 		ResponseEntity<List<String>> response = rest.exchange(postRequest, new ParameterizedTypeReference<List<String>>(){});
+		assertThat(response.getBody(), hasItem("Would create UaaUserIntent [properties=UaaUserProperties [email=dan.young@example.com, givenName=Dan, familyName=Young]]"));
 		assertThat(response.getBody(), hasItem("Would not create OrgIntent [name=my-lovely-org]"));
 		assertThat(response.getBody(), hasItem(containsString("Would not create SpaceIntent [name=DEV")));
 		assertThat(response.getBody(), hasItem(containsString("Would create SpaceIntent [name=PROD")));
 		assertThat(response.getBody(), hasItem(containsString("Would update UpsIntent, changing entry password from oldpassword to secret in credentials, and removing entry secret->notneeded from credentials")));
+	}
+
+	private void deleteUser(String email)
+	{
+		Optional<String> id = uaaFacade.findUser(email);
+		if(id.isPresent())
+		{
+			uaaFacade.deleteUser(id.get());
+		}
 	}
 }

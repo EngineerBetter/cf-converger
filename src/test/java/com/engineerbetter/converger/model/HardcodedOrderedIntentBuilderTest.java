@@ -83,9 +83,9 @@ public class HardcodedOrderedIntentBuilderTest
 		assertThisAppearsBeforeThat(orgHandler, devSpaceHandler, handlers);
 		assertThisAppearsBeforeThat(orgHandler, prodSpaceHandler, handlers);
 
-		UaaUserIntent uaaDanYoung = new UaaUserIntent(new UaaUserProperties("dan.young@engineerbetter.com", "Dan", "Young"));
+		UaaUserIntent uaaDanYoung = new UaaUserIntent(new UaaUserProperties("dan.young@example.com", "Dan", "Young"));
 		Handler<UaaUserIntent> uaaDanYoungHandler = handlerFactory.build(uaaDanYoung);
-		UaaUserIntent uaaDanJones = new UaaUserIntent(new UaaUserProperties("daniel.jones@engineerbetter.com", "Daniel", "Jones"));
+		UaaUserIntent uaaDanJones = new UaaUserIntent(new UaaUserProperties("daniel.jones@example.com", "Daniel", "Jones"));
 		Handler<UaaUserIntent> uaaDanJonesHandler = handlerFactory.build(uaaDanJones);
 
 		CfUserIntent cfDanYoung = new CfUserIntent(uaaDanYoung);
