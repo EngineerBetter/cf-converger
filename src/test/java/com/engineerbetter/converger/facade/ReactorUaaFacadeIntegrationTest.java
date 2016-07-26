@@ -13,6 +13,8 @@ import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.engineerbetter.converger.properties.UaaUserProperties;
+
 public class ReactorUaaFacadeIntegrationTest
 {
 	private UaaFacade uaa;
@@ -45,14 +47,15 @@ public class ReactorUaaFacadeIntegrationTest
 		assertThat("User used to run tests should exist in the UAA", id.isPresent(), is(true));
 		assertThat(id.get(), not(""));
 
-		String createdId = uaa.createUser("cf-converger-test-user");
+		UaaUserProperties properties = new UaaUserProperties("cfconvergertestuser@engineerbetter.com", "Geoff", "McGeofferson");
+		String createdId = uaa.createUser(properties);
 		assertThat(createdId, notNullValue());
-		Optional<String> foundId = uaa.findUser("cf-converger-test-user");
+		Optional<String> foundId = uaa.findUser("cfconvergertestuser@engineerbetter.com");
 		assertThat("User that test created should be findable", foundId.isPresent(), is(true));
 
 		uaa.deleteUser(foundId.get());
 
-		foundId = uaa.findUser("cf-converger-test-user");
+		foundId = uaa.findUser("cfconvergertestuser@engineerbetter.com");
 		assertThat("User that test deleted should not be findable", foundId.isPresent(), is(false));
 	}
 }

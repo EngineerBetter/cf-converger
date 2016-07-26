@@ -12,6 +12,8 @@ import org.cloudfoundry.uaa.users.ListUsersResponse;
 import org.cloudfoundry.uaa.users.Name;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.engineerbetter.converger.properties.UaaUserProperties;
+
 public class ReactorUaaClientFacade implements UaaFacade
 {
 	private final UaaClient uaa;
@@ -36,11 +38,11 @@ public class ReactorUaaClientFacade implements UaaFacade
 	}
 
 	@Override
-	public String createUser(String email)
+	public String createUser(UaaUserProperties properties)
 	{
-		Email emailInstance = Email.builder().value(email).primary(true).build();
-		Name name = Name.builder().givenName("GivenName").familyName("FamilyName").build();
-		CreateUserResponse response = uaa.users().create(CreateUserRequest.builder().userName(email).password("password").name(name).email(emailInstance).build()).block();
+		Email emailInstance = Email.builder().value(properties.email).primary(true).build();
+		Name name = Name.builder().givenName(properties.givenName).familyName(properties.familyName).build();
+		CreateUserResponse response = uaa.users().create(CreateUserRequest.builder().userName(properties.email).password("password").name(name).email(emailInstance).build()).block();
 		return response.getId();
 	}
 
