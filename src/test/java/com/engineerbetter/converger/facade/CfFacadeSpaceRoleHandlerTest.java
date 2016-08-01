@@ -11,21 +11,22 @@ import org.junit.Test;
 
 import com.engineerbetter.converger.facade.CloudFoundryFacade.SpaceRole;
 import com.engineerbetter.converger.intents.CfUserIntent;
+import com.engineerbetter.converger.intents.Handler;
+import com.engineerbetter.converger.intents.Intent;
 import com.engineerbetter.converger.intents.OrgIntent;
-import com.engineerbetter.converger.intents.SpaceDeveloperIntent;
 import com.engineerbetter.converger.intents.SpaceIntent;
 import com.engineerbetter.converger.intents.UaaUserIntent;
 import com.engineerbetter.converger.properties.NameProperty;
 import com.engineerbetter.converger.resolution.IdentifiableResolution;
 import com.engineerbetter.converger.resolution.RelationshipResolution;
 
-public class CfFacadeSpaceDeveloperTest
+public abstract class CfFacadeSpaceRoleHandlerTest<I extends Intent<RelationshipResolution>, H extends Handler<I>>
 {
-	private CloudFoundryFacade cf;
-	private SpaceIntent spaceIntent;
-	private CfUserIntent cfUserIntent;
-	private SpaceDeveloperIntent intent;
-	private CfFacadeSpaceDeveloperHandler handler;
+	protected CloudFoundryFacade cf;
+	protected SpaceIntent spaceIntent;
+	protected CfUserIntent cfUserIntent;
+	protected I intent;
+	protected H handler;
 
 
 	@Before
@@ -34,9 +35,14 @@ public class CfFacadeSpaceDeveloperTest
 		cf = mock(CloudFoundryFacade.class);
 		spaceIntent = new SpaceIntent(new NameProperty("DEV"), mock(OrgIntent.class));
 		cfUserIntent = new CfUserIntent(mock(UaaUserIntent.class));
-		intent = new SpaceDeveloperIntent(spaceIntent, cfUserIntent);
-		handler = new CfFacadeSpaceDeveloperHandler(intent, cf);
+		setupInstances();
 	}
+
+
+	abstract void setupInstances();
+
+
+	abstract SpaceRole getRole();
 
 
 	@Test
@@ -48,7 +54,6 @@ public class CfFacadeSpaceDeveloperTest
 		assertThat(intent.getResolution().exists(), is(false));
 	}
 
-
 	@Test
 	public void absentIfUserAbsent()
 	{
@@ -58,28 +63,25 @@ public class CfFacadeSpaceDeveloperTest
 		assertThat(intent.getResolution().exists(), is(false));
 	}
 
-
 	@Test
 	public void absentIfFacadeReturnsFalse()
 	{
 		spaceIntent.setResolution(IdentifiableResolution.of("space-id"));
 		cfUserIntent.setResolution(IdentifiableResolution.of("user-id"));
-		given(cf.hasSpaceRole("user-id", "space-id", SpaceRole.DEVELOPER)).willReturn(false);
+		given(cf.hasSpaceRole("user-id", "space-id", getRole())).willReturn(false);
 		handler.resolve();
 		assertThat(intent.getResolution().exists(), is(false));
 	}
-
 
 	@Test
 	public void presentIfFacadeReturnsTrue()
 	{
 		spaceIntent.setResolution(IdentifiableResolution.of("space-id"));
 		cfUserIntent.setResolution(IdentifiableResolution.of("user-id"));
-		given(cf.hasSpaceRole("user-id", "space-id", SpaceRole.DEVELOPER)).willReturn(true);
+		given(cf.hasSpaceRole("user-id", "space-id", getRole())).willReturn(true);
 		handler.resolve();
 		assertThat(intent.getResolution().exists(), is(true));
 	}
-
 
 	@Test
 	public void convergeNoopsIfPresent()
@@ -89,7 +91,6 @@ public class CfFacadeSpaceDeveloperTest
 		then(cf).should(times(0)).setSpaceRole(any(), any(), any());
 	}
 
-
 	@Test
 	public void convergeCreatesIfAbsent()
 	{
@@ -97,6 +98,7 @@ public class CfFacadeSpaceDeveloperTest
 		cfUserIntent.setResolution(IdentifiableResolution.of("user-id"));
 		intent.setResolution(RelationshipResolution.of(false));
 		handler.converge();
-		then(cf).should().setSpaceRole("user-id", "space-id", SpaceRole.DEVELOPER);
+		then(cf).should().setSpaceRole("user-id", "space-id", getRole());
 	}
+
 }

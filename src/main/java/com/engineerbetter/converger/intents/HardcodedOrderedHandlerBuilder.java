@@ -122,6 +122,22 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 				addVertexAndEdge(spaceIntent, spaceDeveloperIntent, dag);
 			}
 
+			for(String manager : space.managers)
+			{
+				// Multiple returns would have made this easier to DRY out!
+				UaaUserIntent uaaUserIntent = uaaUserIntents.get(manager);
+				addVertex(uaaUserIntent, dag);
+				CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
+				addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);
+				UserOrgIntent userOrgIntent = dedupe(new UserOrgIntent(orgIntent, cfUserIntent));
+				addVertexAndEdge(cfUserIntent, userOrgIntent, dag);
+
+				// This is pretty interesting. We depend on the datum of User and Space ID, but causally we depend on UserOrg
+				SpaceManagerIntent spaceDeveloperIntent = dedupe(new SpaceManagerIntent(spaceIntent, cfUserIntent));
+				addVertexAndEdge(userOrgIntent, spaceDeveloperIntent, dag);
+				addVertexAndEdge(spaceIntent, spaceDeveloperIntent, dag);
+			}
+
 			for(Ups ups : space.upss)
 			{
 				UpsIntent upsIntent = dedupe(new UpsIntent(new UpsProperties(ups.name, ups.credentials), spaceIntent));

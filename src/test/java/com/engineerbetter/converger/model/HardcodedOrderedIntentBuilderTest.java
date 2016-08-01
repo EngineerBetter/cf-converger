@@ -23,6 +23,7 @@ import com.engineerbetter.converger.intents.OrgIntent;
 import com.engineerbetter.converger.intents.OrgManagerIntent;
 import com.engineerbetter.converger.intents.SpaceDeveloperIntent;
 import com.engineerbetter.converger.intents.SpaceIntent;
+import com.engineerbetter.converger.intents.SpaceManagerIntent;
 import com.engineerbetter.converger.intents.UaaUserIntent;
 import com.engineerbetter.converger.intents.UserOrgIntent;
 import com.engineerbetter.converger.properties.NameProperty;
@@ -94,6 +95,11 @@ public class HardcodedOrderedIntentBuilderTest
 		Handler<SpaceDeveloperIntent> devSpaceDeveloperHandler = handlerFactory.build(devSpaceDeveloper);
 		assertThisAppearsBeforeThat(devSpaceHandler, devSpaceDeveloperHandler, handlers);
 		assertThisAppearsBeforeThat(danJonesOrgHandler, devSpaceDeveloperHandler, handlers);
+
+		SpaceManagerIntent devSpaceManager = new SpaceManagerIntent(devSpace, cfDanJones);
+		Handler<SpaceManagerIntent> devSpaceManagerHandler = handlerFactory.build(devSpaceManager);
+		assertThisAppearsBeforeThat(devSpaceHandler, devSpaceManagerHandler, handlers);
+		assertThisAppearsBeforeThat(danJonesOrgHandler, devSpaceManagerHandler, handlers);
 
 		SpaceDeveloperIntent prodSpaceDeveloper = new SpaceDeveloperIntent(prodSpace, cfDanJones);
 		Handler<SpaceDeveloperIntent> prodSpaceDeveloperHandler = handlerFactory.build(prodSpaceDeveloper);

@@ -22,6 +22,8 @@ org:
         password: secret
     space_developers:
     - daniel.jones@example.com
+    space_managers:
+    - daniel.jones@example.com
   - name: PROD
     space_developers:
     - daniel.jones@example.com
