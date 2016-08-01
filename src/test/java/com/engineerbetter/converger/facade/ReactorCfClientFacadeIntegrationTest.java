@@ -18,7 +18,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.engineerbetter.converger.facade.fudge.CreateUserOps;
+import com.engineerbetter.converger.facade.CloudFoundryFacade.OrgRole;
+import com.engineerbetter.converger.facade.fudge.ModifyingUserOps;
 import com.engineerbetter.converger.properties.UpsProperties;
 
 public class ReactorCfClientFacadeIntegrationTest
@@ -42,7 +43,7 @@ public class ReactorCfClientFacadeIntegrationTest
 		DefaultConnectionContext connectionContext = DefaultConnectionContext.builder().apiHost(host).skipSslValidation(true).build();
 		PasswordGrantTokenProvider tokenProvider = PasswordGrantTokenProvider.builder().username(username).password(password).build();
 		cfClient = ReactorCloudFoundryClient.builder().connectionContext(connectionContext).tokenProvider(tokenProvider).build();
-		CreateUserOps createUserOps = new CreateUserOps(connectionContext, connectionContext.getRoot(), tokenProvider);
+		ModifyingUserOps createUserOps = new ModifyingUserOps(connectionContext, connectionContext.getRoot(), tokenProvider);
 		facade = new ReactorCfClientFacade(cfClient, createUserOps);
 
 		String orgName = "converger-test-"+UUID.randomUUID().toString();
@@ -99,7 +100,12 @@ public class ReactorCfClientFacadeIntegrationTest
 	public void orgManagers()
 	{
 		String userId = UUID.randomUUID().toString();
+		assertThat("user should not exist before test creates it", facade.userExists(userId), is(false));
 		facade.createUser(userId);
 		assertThat("created user ID should exist in CF", facade.userExists(userId), is(true));
+		facade.addUserToOrg(userId, orgId);
+		assertThat("user should be in org", facade.isUserInOrg(userId, orgId), is(true));
+		facade.setOrgRole(userId, orgId, OrgRole.ORG_MANAGER);
+		assertThat("user should be org manager", facade.hasOrgRole(userId, orgId, OrgRole.ORG_MANAGER), is(true));
 	}
 }

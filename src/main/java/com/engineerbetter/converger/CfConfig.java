@@ -17,7 +17,7 @@ import com.engineerbetter.converger.facade.CloudFoundryFacade;
 import com.engineerbetter.converger.facade.ReactorCfClientFacade;
 import com.engineerbetter.converger.facade.ReactorUaaClientFacade;
 import com.engineerbetter.converger.facade.UaaFacade;
-import com.engineerbetter.converger.facade.fudge.CreateUserOps;
+import com.engineerbetter.converger.facade.fudge.ModifyingUserOps;
 
 @Configuration
 @Profile("!test")
@@ -39,9 +39,9 @@ public class CfConfig
 				.build();
 	}
 
-	@Bean CreateUserOps createUserOps(ConnectionContext connectionContext, TokenProvider tokenProvider)
+	@Bean ModifyingUserOps createUserOps(ConnectionContext connectionContext, TokenProvider tokenProvider)
 	{
-		return new CreateUserOps(connectionContext, connectionContext.getRoot(), tokenProvider);
+		return new ModifyingUserOps(connectionContext, connectionContext.getRoot(), tokenProvider);
 	}
 
 	@Bean
@@ -62,7 +62,7 @@ public class CfConfig
 	}
 
 	@Bean
-	CloudFoundryFacade cfFacade(CloudFoundryClient cfClient, CreateUserOps createUserOps)
+	CloudFoundryFacade cfFacade(CloudFoundryClient cfClient, ModifyingUserOps createUserOps)
 	{
 		return new ReactorCfClientFacade(cfClient, createUserOps);
 	}

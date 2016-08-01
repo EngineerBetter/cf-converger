@@ -6,6 +6,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
@@ -42,17 +44,17 @@ import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.engineerbetter.converger.facade.fudge.CreateUserOps;
 import com.engineerbetter.converger.facade.fudge.CreateUserRequest;
+import com.engineerbetter.converger.facade.fudge.ModifyingUserOps;
 import com.engineerbetter.converger.properties.UpsProperties;
 
 public class ReactorCfClientFacade implements CloudFoundryFacade
 {
 	private final CloudFoundryClient cf;
-	private final CreateUserOps createUserOps;
+	private final ModifyingUserOps createUserOps;
 
 	@Autowired
-	public ReactorCfClientFacade(CloudFoundryClient cf, CreateUserOps createUserOps)
+	public ReactorCfClientFacade(CloudFoundryClient cf, ModifyingUserOps createUserOps)
 	{
 		this.cf = cf;
 		this.createUserOps = createUserOps;
@@ -174,6 +176,13 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 
 
 	@Override
+	public void addUserToOrg(String userId, String orgId)
+	{
+		cf.organizations().associateUser(AssociateOrganizationUserRequest.builder().userId(userId).organizationId(orgId).build()).block();
+	}
+
+
+	@Override
 	public boolean isUserInOrg(String userId, String orgId)
 	{
 		ListOrganizationUsersResponse response = cf.organizations().listUsers(ListOrganizationUsersRequest.builder().organizationId(orgId).build()).block();
@@ -189,12 +198,27 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 			ListOrganizationManagersResponse response = cf.organizations().listManagers(ListOrganizationManagersRequest.builder().organizationId(orgId).build()).block();
 			return response.getResources().stream().filter(r -> r.getMetadata().getId().equals(userId)).count() == 1;
 		}
-		else
+		else if(role == OrgRole.ORG_AUDITOR)
 		{
 			ListOrganizationAuditorsResponse response = cf.organizations().listAuditors(ListOrganizationAuditorsRequest.builder().organizationId(orgId).build()).block();
 			return response.getResources().stream().filter(r -> r.getMetadata().getId().equals(userId)).count() == 1;
 		}
+		else
+		{
+			throw new RuntimeException("Unknown Org Role "+role);
+		}
 	}
+
+
+	@Override
+	public void setOrgRole(String userId, String orgId, OrgRole role)
+	{
+		if(role == OrgRole.ORG_MANAGER)
+		{
+			cf.organizations().associateManager(AssociateOrganizationManagerRequest.builder().organizationId(orgId).managerId(userId).build()).block();
+		}
+	}
+
 
 	@Override
 	public boolean hasSpaceRole(String userId, String spaceId, SpaceRole role)

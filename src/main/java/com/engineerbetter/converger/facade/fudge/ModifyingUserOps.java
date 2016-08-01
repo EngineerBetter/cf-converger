@@ -12,9 +12,9 @@ import reactor.core.publisher.Mono;
  * @see CreateUserRequest
  *
  */
-public class CreateUserOps extends AbstractClientV2Operations
+public class ModifyingUserOps extends AbstractClientV2Operations
 {
-	public CreateUserOps(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
+	public ModifyingUserOps(ConnectionContext connectionContext, Mono<String> root, TokenProvider tokenProvider) {
 		super(connectionContext, root, tokenProvider);
 	}
 

@@ -17,7 +17,7 @@ import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.engineerbetter.converger.facade.fudge.CreateUserOps;
+import com.engineerbetter.converger.facade.fudge.ModifyingUserOps;
 
 public class ReactorCfClientFacadeOrgsIntegrationTest
 {
@@ -41,7 +41,7 @@ public class ReactorCfClientFacadeOrgsIntegrationTest
 		TokenProvider tokenProvider = PasswordGrantTokenProvider.builder().username(username).password(password).build();
 		cfClient = ReactorCloudFoundryClient.builder().connectionContext(connectionContext).tokenProvider(tokenProvider).build();
 		cfOps = DefaultCloudFoundryOperations.builder().cloudFoundryClient(cfClient).build();
-		facade = new ReactorCfClientFacade(cfClient, mock(CreateUserOps.class));
+		facade = new ReactorCfClientFacade(cfClient, mock(ModifyingUserOps.class));
 	}
 
 
