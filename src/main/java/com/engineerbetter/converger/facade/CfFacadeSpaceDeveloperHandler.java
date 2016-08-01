@@ -2,6 +2,7 @@ package com.engineerbetter.converger.facade;
 
 import java.util.Optional;
 
+import com.engineerbetter.converger.facade.CloudFoundryFacade.SpaceRole;
 import com.engineerbetter.converger.intents.SpaceDeveloperHandler;
 import com.engineerbetter.converger.intents.SpaceDeveloperIntent;
 import com.engineerbetter.converger.resolution.RelationshipResolution;
@@ -35,6 +36,10 @@ public class CfFacadeSpaceDeveloperHandler extends SpaceDeveloperHandler
 	@Override
 	public void converge()
 	{
+		if(! intent.getResolution().exists())
+		{
+			cf.setSpaceRole(intent.userIntent.getResolution().getId().get(), intent.spaceIntent.getResolution().getId().get(), SpaceRole.DEVELOPER);
+		}
 	}
 
 }

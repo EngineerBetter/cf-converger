@@ -3,7 +3,7 @@ package com.engineerbetter.converger.intents;
 import com.engineerbetter.converger.properties.NameProperty;
 import com.engineerbetter.converger.resolution.IdentifiableResolution;
 
-public final class OrgIntent implements Intent<IdentifiableResolution>
+public class OrgIntent implements Intent<IdentifiableResolution>
 {
 	public final NameProperty name;
 	private IdentifiableResolution resolution;

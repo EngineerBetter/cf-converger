@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.engineerbetter.converger.facade.CloudFoundryFacade.OrgRole;
+import com.engineerbetter.converger.facade.CloudFoundryFacade.SpaceRole;
 import com.engineerbetter.converger.facade.ops.ModifyingUserOps;
 import com.engineerbetter.converger.properties.UpsProperties;
 
@@ -119,5 +120,34 @@ public class ReactorCfClientFacadeIntegrationTest
 
 		facade.deleteUser(userId);
 		assertThat("user should not exist after deletion", facade.userExists(userId), is(false));
+	}
+
+
+	@Test
+	public void spaceRoles()
+	{
+		String userId = UUID.randomUUID().toString();
+		assertThat("user should not exist before test creates it", facade.userExists(userId), is(false));
+		facade.createUser(userId);
+		assertThat("created user ID should exist in CF", facade.userExists(userId), is(true));
+		facade.addUserToOrg(userId, orgId);
+		assertThat("user should be in org", facade.isUserInOrg(userId, orgId), is(true));
+
+		String spaceId = facade.createSpace("test-space", orgId);
+
+		assertSpaceRole(spaceId, userId, SpaceRole.AUDITOR);
+		assertSpaceRole(spaceId, userId, SpaceRole.DEVELOPER);
+		assertSpaceRole(spaceId, userId, SpaceRole.MANAGER);
+
+		facade.deleteUser(userId);
+		assertThat("user should not exist after deletion", facade.userExists(userId), is(false));
+	}
+
+
+	private void assertSpaceRole(String spaceId, String userId, SpaceRole role)
+	{
+		assertThat("user should not yet be space "+role, facade.hasSpaceRole(userId, spaceId, role), is(false));
+		facade.setSpaceRole(userId, spaceId, role);
+		assertThat("user should be space "+role, facade.hasSpaceRole(userId, spaceId, role), is(true));
 	}
 }

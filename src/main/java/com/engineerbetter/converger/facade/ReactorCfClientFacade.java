@@ -20,6 +20,9 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceDeveloperRequest;
+import org.cloudfoundry.client.v2.spaces.AssociateSpaceManagerRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
@@ -265,13 +268,39 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 			ListSpaceDevelopersResponse response = cf.spaces().listDevelopers(ListSpaceDevelopersRequest.builder().spaceId(spaceId).build()).block();
 			users = response.getResources();
 		}
-		else
+		else if(role == SpaceRole.MANAGER)
 		{
 			ListSpaceManagersResponse response = cf.spaces().listManagers(ListSpaceManagersRequest.builder().spaceId(spaceId).build()).block();
 			users = response.getResources();
 		}
+		else
+		{
+			throw new RuntimeException("Unknown Space Role "+role);
+		}
 
 		return users.stream().filter(u -> u.getMetadata().getId().equals(userId)).count() == 1L;
+	}
+
+
+	@Override
+	public void setSpaceRole(String userId, String spaceId, SpaceRole role)
+	{
+		if(role == SpaceRole.AUDITOR)
+		{
+			cf.spaces().associateAuditor(AssociateSpaceAuditorRequest.builder().spaceId(spaceId).auditorId(userId).build()).block();
+		}
+		else if(role == SpaceRole.DEVELOPER)
+		{
+			cf.spaces().associateDeveloper(AssociateSpaceDeveloperRequest.builder().spaceId(spaceId).developerId(userId).build()).block();
+		}
+		else if(role == SpaceRole.MANAGER)
+		{
+			cf.spaces().associateManager(AssociateSpaceManagerRequest.builder().spaceId(spaceId).managerId(userId).build()).block();
+		}
+		else
+		{
+			throw new RuntimeException("Unknown Space Role "+role);
+		}
 	}
 
 	Mono<CloudFoundryClient> getCloudFoundryClientPublisher() {
