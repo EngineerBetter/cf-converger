@@ -193,12 +193,12 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public boolean hasOrgRole(String userId, String orgId, OrgRole role)
 	{
-		if(role == OrgRole.ORG_MANAGER)
+		if(role == OrgRole.MANAGER)
 		{
 			ListOrganizationManagersResponse response = cf.organizations().listManagers(ListOrganizationManagersRequest.builder().organizationId(orgId).build()).block();
 			return response.getResources().stream().filter(r -> r.getMetadata().getId().equals(userId)).count() == 1;
 		}
-		else if(role == OrgRole.ORG_AUDITOR)
+		else if(role == OrgRole.AUDITOR)
 		{
 			ListOrganizationAuditorsResponse response = cf.organizations().listAuditors(ListOrganizationAuditorsRequest.builder().organizationId(orgId).build()).block();
 			return response.getResources().stream().filter(r -> r.getMetadata().getId().equals(userId)).count() == 1;
@@ -213,7 +213,7 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public void setOrgRole(String userId, String orgId, OrgRole role)
 	{
-		if(role == OrgRole.ORG_MANAGER)
+		if(role == OrgRole.MANAGER)
 		{
 			cf.organizations().associateManager(AssociateOrganizationManagerRequest.builder().organizationId(orgId).managerId(userId).build()).block();
 		}
@@ -224,12 +224,12 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	public boolean hasSpaceRole(String userId, String spaceId, SpaceRole role)
 	{
 		List<UserResource> users;
-		if(role == SpaceRole.SPACE_AUDITOR)
+		if(role == SpaceRole.AUDITOR)
 		{
 			ListSpaceAuditorsResponse response = cf.spaces().listAuditors(ListSpaceAuditorsRequest.builder().spaceId(spaceId).build()).block();
 			users = response.getResources();
 		}
-		else if(role == SpaceRole.SPACE_DEVELOPER)
+		else if(role == SpaceRole.DEVELOPER)
 		{
 			ListSpaceDevelopersResponse response = cf.spaces().listDevelopers(ListSpaceDevelopersRequest.builder().spaceId(spaceId).build()).block();
 			users = response.getResources();

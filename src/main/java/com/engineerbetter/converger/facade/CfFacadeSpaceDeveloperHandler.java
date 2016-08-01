@@ -24,7 +24,7 @@ public class CfFacadeSpaceDeveloperHandler extends SpaceDeveloperHandler
 
 		if(spaceId.isPresent() && userId.isPresent())
 		{
-			intent.setResolution(RelationshipResolution.of(cf.hasSpaceRole(userId.get(), spaceId.get(), CloudFoundryFacade.SpaceRole.SPACE_DEVELOPER)));
+			intent.setResolution(RelationshipResolution.of(cf.hasSpaceRole(userId.get(), spaceId.get(), CloudFoundryFacade.SpaceRole.DEVELOPER)));
 		}
 		else
 		{

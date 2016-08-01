@@ -8,15 +8,15 @@ public interface CloudFoundryFacade
 {
 	public enum OrgRole
 	{
-		ORG_MANAGER,
-		ORG_AUDITOR
+		MANAGER,
+		AUDITOR
 	}
 
 	public enum SpaceRole
 	{
-		SPACE_MANAGER,
-		SPACE_DEVELOPER,
-		SPACE_AUDITOR
+		MANAGER,
+		DEVELOPER,
+		AUDITOR
 	}
 
 	Optional<String> findOrg(String name);

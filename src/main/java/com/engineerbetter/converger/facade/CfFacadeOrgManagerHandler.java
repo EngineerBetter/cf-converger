@@ -25,7 +25,7 @@ public class CfFacadeOrgManagerHandler extends OrgManagerHandler
 
 		if(orgId.isPresent() && userId.isPresent())
 		{
-			intent.setResolution(RelationshipResolution.of(cf.hasOrgRole(userId.get(), orgId.get(), CloudFoundryFacade.OrgRole.ORG_MANAGER)));
+			intent.setResolution(RelationshipResolution.of(cf.hasOrgRole(userId.get(), orgId.get(), CloudFoundryFacade.OrgRole.MANAGER)));
 		}
 		else
 		{
@@ -39,7 +39,7 @@ public class CfFacadeOrgManagerHandler extends OrgManagerHandler
 	{
 		if(! intent.getResolution().exists())
 		{
-			cf.setOrgRole(intent.userIntent.getResolution().getId().get(), intent.orgIntent.getResolution().getId().get(), OrgRole.ORG_MANAGER);
+			cf.setOrgRole(intent.userIntent.getResolution().getId().get(), intent.orgIntent.getResolution().getId().get(), OrgRole.MANAGER);
 		}
 	}
 }

@@ -105,7 +105,7 @@ public class ReactorCfClientFacadeIntegrationTest
 		assertThat("created user ID should exist in CF", facade.userExists(userId), is(true));
 		facade.addUserToOrg(userId, orgId);
 		assertThat("user should be in org", facade.isUserInOrg(userId, orgId), is(true));
-		facade.setOrgRole(userId, orgId, OrgRole.ORG_MANAGER);
-		assertThat("user should be org manager", facade.hasOrgRole(userId, orgId, OrgRole.ORG_MANAGER), is(true));
+		facade.setOrgRole(userId, orgId, OrgRole.MANAGER);
+		assertThat("user should be org manager", facade.hasOrgRole(userId, orgId, OrgRole.MANAGER), is(true));
 	}
 }

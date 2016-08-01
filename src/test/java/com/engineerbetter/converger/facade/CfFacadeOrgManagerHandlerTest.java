@@ -65,7 +65,7 @@ public class CfFacadeOrgManagerHandlerTest
 	{
 		orgIntent.setResolution(IdentifiableResolution.of("org-id"));
 		cfUserIntent.setResolution(IdentifiableResolution.of("user-id"));
-		given(cf.hasOrgRole("user-id", "org-id", OrgRole.ORG_MANAGER)).willReturn(true);
+		given(cf.hasOrgRole("user-id", "org-id", OrgRole.MANAGER)).willReturn(true);
 		handler.resolve();
 		assertThat(intent.getResolution().exists(), is(true));
 	}
@@ -76,7 +76,7 @@ public class CfFacadeOrgManagerHandlerTest
 	{
 		orgIntent.setResolution(IdentifiableResolution.of("org-id"));
 		cfUserIntent.setResolution(IdentifiableResolution.of("user-id"));
-		given(cf.hasOrgRole("user-id", "org-id", OrgRole.ORG_MANAGER)).willReturn(false);
+		given(cf.hasOrgRole("user-id", "org-id", OrgRole.MANAGER)).willReturn(false);
 		handler.resolve();
 		assertThat(intent.getResolution().exists(), is(false));
 	}
@@ -98,6 +98,6 @@ public class CfFacadeOrgManagerHandlerTest
 		orgIntent.setResolution(IdentifiableResolution.of("org-id"));
 		intent.setResolution(RelationshipResolution.of(false));
 		handler.converge();
-		then(cf).should().setOrgRole("user-id", "org-id",OrgRole.ORG_MANAGER);
+		then(cf).should().setOrgRole("user-id", "org-id",OrgRole.MANAGER);
 	}
 }

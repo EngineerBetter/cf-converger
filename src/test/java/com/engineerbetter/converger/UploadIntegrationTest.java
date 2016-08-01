@@ -101,7 +101,7 @@ public class UploadIntegrationTest {
 		assertThat("my-lovely-org should exist", orgId.isPresent(), is(true));
 
 		assertThat("dan.young@example should be in my-lovely-org", cfFacade.isUserInOrg(dyId.get(), orgId.get()), is(true));
-		assertThat("dan.young@example should be manager of my-lovely-org", cfFacade.hasOrgRole(dyId.get(), orgId.get(), OrgRole.ORG_MANAGER), is(true));
+		assertThat("dan.young@example should be manager of my-lovely-org", cfFacade.hasOrgRole(dyId.get(), orgId.get(), OrgRole.MANAGER), is(true));
 
 		Optional<String> devId = cfFacade.findSpace("DEV", orgId.get());
 		assertThat("DEV should exist", devId.isPresent(), is(true));
