@@ -2,6 +2,7 @@ package com.engineerbetter.converger.facade;
 
 import java.util.Optional;
 
+import com.engineerbetter.converger.facade.CloudFoundryFacade.OrgRole;
 import com.engineerbetter.converger.intents.OrgManagerHandler;
 import com.engineerbetter.converger.intents.OrgManagerIntent;
 import com.engineerbetter.converger.resolution.RelationshipResolution;
@@ -36,5 +37,9 @@ public class CfFacadeOrgManagerHandler extends OrgManagerHandler
 	@Override
 	public void converge()
 	{
+		if(! intent.getResolution().exists())
+		{
+			cf.setOrgRole(intent.userIntent.getResolution().getId().get(), intent.orgIntent.getResolution().getId().get(), OrgRole.ORG_MANAGER);
+		}
 	}
 }

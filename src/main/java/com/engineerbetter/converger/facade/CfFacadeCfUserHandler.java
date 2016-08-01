@@ -34,6 +34,12 @@ public class CfFacadeCfUserHandler extends CfUserHandler
 	@Override
 	public void converge()
 	{
+		if(! intent.getResolution().exists())
+		{
+			String userId = intent.uaaUserIntent.getResolution().getId().get();
+			cf.createUser(userId);
+			intent.setResolution(IdentifiableResolution.of(userId));
+		}
 	}
 
 }

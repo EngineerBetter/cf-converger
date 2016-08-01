@@ -36,6 +36,10 @@ public class CfFacadeUserOrgHandler extends UserOrgHandler
 	@Override
 	public void converge()
 	{
+		if(! intent.getResolution().exists())
+		{
+			cf.addUserToOrg(intent.userIntent.getResolution().getId().get(), intent.orgIntent.getResolution().getId().get());
+		}
 	}
 
 }
