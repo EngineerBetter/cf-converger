@@ -17,7 +17,7 @@ import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.engineerbetter.converger.facade.fudge.ModifyingUserOps;
+import com.engineerbetter.converger.facade.ops.ModifyingUserOps;
 
 public class ReactorCfClientFacadeOrgsIntegrationTest
 {

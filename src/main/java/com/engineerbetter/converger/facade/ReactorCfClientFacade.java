@@ -44,8 +44,8 @@ import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.engineerbetter.converger.facade.fudge.CreateUserRequest;
-import com.engineerbetter.converger.facade.fudge.ModifyingUserOps;
+import com.engineerbetter.converger.facade.ops.CreateUserRequest;
+import com.engineerbetter.converger.facade.ops.ModifyingUserOps;
 import com.engineerbetter.converger.properties.UpsProperties;
 
 public class ReactorCfClientFacade implements CloudFoundryFacade

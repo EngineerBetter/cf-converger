@@ -17,7 +17,7 @@ import com.engineerbetter.converger.facade.CloudFoundryFacade;
 import com.engineerbetter.converger.facade.ReactorCfClientFacade;
 import com.engineerbetter.converger.facade.ReactorUaaClientFacade;
 import com.engineerbetter.converger.facade.UaaFacade;
-import com.engineerbetter.converger.facade.fudge.ModifyingUserOps;
+import com.engineerbetter.converger.facade.ops.ModifyingUserOps;
 
 @Configuration
 @Profile("!test")

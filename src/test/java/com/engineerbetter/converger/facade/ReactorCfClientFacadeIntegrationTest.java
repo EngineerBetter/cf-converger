@@ -19,7 +19,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.engineerbetter.converger.facade.CloudFoundryFacade.OrgRole;
-import com.engineerbetter.converger.facade.fudge.ModifyingUserOps;
+import com.engineerbetter.converger.facade.ops.ModifyingUserOps;
 import com.engineerbetter.converger.properties.UpsProperties;
 
 public class ReactorCfClientFacadeIntegrationTest
