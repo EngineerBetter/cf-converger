@@ -41,9 +41,12 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
-import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.util.PaginationUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import com.engineerbetter.converger.facade.ops.CreateUserRequest;
 import com.engineerbetter.converger.facade.ops.DeleteUserRequest;
@@ -176,8 +179,8 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public boolean userExists(String id)
 	{
-		ListUsersResponse response = cf.users().list(ListUsersRequest.builder().build()).block();
-		return response.getResources().stream().filter(u -> u.getMetadata().getId().equals(id)).count() == 1L;
+		Flux<UserResource> allUsers = PaginationUtils.requestClientV2Resources(page -> cf.users().list(ListUsersRequest.builder().page(page).build()));
+		return allUsers.toStream().filter(u -> u.getMetadata().getId().equals(id)).count() == 1L;
 	}
 
 
@@ -269,6 +272,12 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		}
 
 		return users.stream().filter(u -> u.getMetadata().getId().equals(userId)).count() == 1L;
+	}
+
+	Mono<CloudFoundryClient> getCloudFoundryClientPublisher() {
+		return Optional.ofNullable(cf)
+				.map(Mono::just)
+				.orElse(Mono.error(new IllegalStateException("CloudFoundryClient must be set")));
 	}
 
 }
