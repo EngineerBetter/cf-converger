@@ -42,16 +42,20 @@ import org.cloudfoundry.client.v2.users.ListUsersResponse;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.engineerbetter.converger.facade.fudge.CreateUserOps;
+import com.engineerbetter.converger.facade.fudge.CreateUserRequest;
 import com.engineerbetter.converger.properties.UpsProperties;
 
 public class ReactorCfClientFacade implements CloudFoundryFacade
 {
 	private final CloudFoundryClient cf;
+	private final CreateUserOps createUserOps;
 
 	@Autowired
-	public ReactorCfClientFacade(CloudFoundryClient cf)
+	public ReactorCfClientFacade(CloudFoundryClient cf, CreateUserOps createUserOps)
 	{
 		this.cf = cf;
+		this.createUserOps = createUserOps;
 	}
 
 	@Override
@@ -153,12 +157,29 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		cf.userProvidedServiceInstances().delete(DeleteUserProvidedServiceInstanceRequest.builder().userProvidedServiceInstanceId(id).build()).block();
 	}
 
+
 	@Override
 	public boolean userExists(String id)
 	{
 		ListUsersResponse response = cf.users().list(ListUsersRequest.builder().build()).block();
 		return response.getResources().stream().filter(u -> u.getMetadata().getId().equals(id)).count() == 1L;
 	}
+
+
+	@Override
+	public void createUser(String id)
+	{
+		createUserOps.create(new CreateUserRequest(id)).block();
+	}
+
+
+	@Override
+	public boolean isUserInOrg(String userId, String orgId)
+	{
+		ListOrganizationUsersResponse response = cf.organizations().listUsers(ListOrganizationUsersRequest.builder().organizationId(orgId).build()).block();
+		return response.getResources().stream().filter(u -> u.getMetadata().getId().equals(userId)).count() == 1L;
+	}
+
 
 	@Override
 	public boolean hasOrgRole(String userId, String orgId, OrgRole role)
@@ -196,13 +217,6 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		}
 
 		return users.stream().filter(u -> u.getMetadata().getId().equals(userId)).count() == 1L;
-	}
-
-	@Override
-	public boolean isUserInOrg(String userId, String orgId)
-	{
-		ListOrganizationUsersResponse response = cf.organizations().listUsers(ListOrganizationUsersRequest.builder().organizationId(orgId).build()).block();
-		return response.getResources().stream().filter(u -> u.getMetadata().getId().equals(userId)).count() == 1L;
 	}
 
 }

@@ -11,15 +11,14 @@ import java.util.UUID;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
-import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.DefaultConnectionContext;
-import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.engineerbetter.converger.facade.fudge.CreateUserOps;
 import com.engineerbetter.converger.properties.UpsProperties;
 
 public class ReactorCfClientFacadeIntegrationTest
@@ -40,10 +39,11 @@ public class ReactorCfClientFacadeIntegrationTest
 			throw new RuntimeException("CF_HOST, CF_USERNAME and CF_PASSWORD must be set");
 		}
 
-		ConnectionContext connectionContext = DefaultConnectionContext.builder().apiHost(host).skipSslValidation(true).build();
-		TokenProvider tokenProvider = PasswordGrantTokenProvider.builder().username(username).password(password).build();
+		DefaultConnectionContext connectionContext = DefaultConnectionContext.builder().apiHost(host).skipSslValidation(true).build();
+		PasswordGrantTokenProvider tokenProvider = PasswordGrantTokenProvider.builder().username(username).password(password).build();
 		cfClient = ReactorCloudFoundryClient.builder().connectionContext(connectionContext).tokenProvider(tokenProvider).build();
-		facade = new ReactorCfClientFacade(cfClient);
+		CreateUserOps createUserOps = new CreateUserOps(connectionContext, connectionContext.getRoot(), tokenProvider);
+		facade = new ReactorCfClientFacade(cfClient, createUserOps);
 
 		String orgName = "converger-test-"+UUID.randomUUID().toString();
 		orgId = facade.createOrg(orgName);
@@ -93,5 +93,13 @@ public class ReactorCfClientFacadeIntegrationTest
 
 		facade.deleteUps(id);
 		assertThat(cfClient.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name("test-ups").build()).block().getResources().size(), is(0));
+	}
+
+	@Test
+	public void orgManagers()
+	{
+		String userId = UUID.randomUUID().toString();
+		facade.createUser(userId);
+		assertThat("created user ID should exist in CF", facade.userExists(userId), is(true));
 	}
 }

@@ -35,7 +35,8 @@ public interface CloudFoundryFacade
 	void deleteUps(String id);
 
 	boolean userExists(String id);
+	void createUser(String id);
+	boolean isUserInOrg(String userId, String orgId);
 	boolean hasOrgRole(String userId, String orgId, OrgRole role);
 	boolean hasSpaceRole(String userId, String spaceId, SpaceRole role);
-	boolean isUserInOrg(String userId, String orgId);
 }

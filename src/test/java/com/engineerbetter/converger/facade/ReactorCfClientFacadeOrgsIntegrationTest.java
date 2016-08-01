@@ -2,6 +2,7 @@ package com.engineerbetter.converger.facade;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.Optional;
 
@@ -15,6 +16,8 @@ import org.cloudfoundry.reactor.client.ReactorCloudFoundryClient;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.engineerbetter.converger.facade.fudge.CreateUserOps;
 
 public class ReactorCfClientFacadeOrgsIntegrationTest
 {
@@ -38,8 +41,9 @@ public class ReactorCfClientFacadeOrgsIntegrationTest
 		TokenProvider tokenProvider = PasswordGrantTokenProvider.builder().username(username).password(password).build();
 		cfClient = ReactorCloudFoundryClient.builder().connectionContext(connectionContext).tokenProvider(tokenProvider).build();
 		cfOps = DefaultCloudFoundryOperations.builder().cloudFoundryClient(cfClient).build();
-		facade = new ReactorCfClientFacade(cfClient);
+		facade = new ReactorCfClientFacade(cfClient, mock(CreateUserOps.class));
 	}
+
 
 	@Test
 	public void orgManagement()
