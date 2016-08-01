@@ -132,6 +132,7 @@ public class UploadIntegrationTest {
 		ResponseEntity<List<String>> response = rest.exchange(postRequest, new ParameterizedTypeReference<List<String>>(){});
 		assertThat(response.getBody(), hasItem("Would create UaaUserIntent [properties=UaaUserProperties [email=dan.young@example.com, givenName=Dan, familyName=Young]]"));
 		assertThat(response.getBody(), hasItem("Would not create OrgIntent [name=my-lovely-org]"));
+		assertThat(response.getBody(), hasItem("Would set dan.young@example.com as manager of my-lovely-org"));
 		assertThat(response.getBody(), hasItem(containsString("Would not create SpaceIntent [name=DEV")));
 		assertThat(response.getBody(), hasItem(containsString("Would create SpaceIntent [name=PROD")));
 		assertThat(response.getBody(), hasItem(containsString("Would update UpsIntent, changing entry password from oldpassword to secret in credentials, and removing entry secret->notneeded from credentials")));
