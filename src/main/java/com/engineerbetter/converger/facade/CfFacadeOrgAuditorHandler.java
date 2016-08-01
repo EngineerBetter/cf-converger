@@ -1,0 +1,45 @@
+package com.engineerbetter.converger.facade;
+
+import java.util.Optional;
+
+import com.engineerbetter.converger.facade.CloudFoundryFacade.OrgRole;
+import com.engineerbetter.converger.intents.OrgAuditorHandler;
+import com.engineerbetter.converger.intents.OrgAuditorIntent;
+import com.engineerbetter.converger.resolution.RelationshipResolution;
+
+public class CfFacadeOrgAuditorHandler extends OrgAuditorHandler
+{
+	private final CloudFoundryFacade cf;
+
+	public CfFacadeOrgAuditorHandler(OrgAuditorIntent intent, CloudFoundryFacade cf)
+	{
+		super(intent);
+		this.cf = cf;
+	}
+
+	@Override
+	public void resolve()
+	{
+		Optional<String> orgId = intent.orgIntent.getResolution().getId();
+		Optional<String> userId = intent.userIntent.getResolution().getId();
+
+		if(orgId.isPresent() && userId.isPresent())
+		{
+			intent.setResolution(RelationshipResolution.of(cf.hasOrgRole(userId.get(), orgId.get(), CloudFoundryFacade.OrgRole.AUDITOR)));
+		}
+		else
+		{
+			intent.setResolution(RelationshipResolution.absent());
+		}
+	}
+
+
+	@Override
+	public void converge()
+	{
+		if(! intent.getResolution().exists())
+		{
+			cf.setOrgRole(intent.userIntent.getResolution().getId().get(), intent.orgIntent.getResolution().getId().get(), OrgRole.AUDITOR);
+		}
+	}
+}

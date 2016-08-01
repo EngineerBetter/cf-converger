@@ -88,6 +88,19 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 			addVertexAndEdge(userOrgIntent, orgManagerIntent, dag);
 		}
 
+		for(String auditor : declaration.org.auditors)
+		{
+			UaaUserIntent uaaUserIntent = uaaUserIntents.get(auditor);
+			addVertex(uaaUserIntent, dag);
+			CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
+			addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);
+			UserOrgIntent userOrgIntent = dedupe(new UserOrgIntent(orgIntent, cfUserIntent));
+			addVertexAndEdge(cfUserIntent, userOrgIntent, dag);
+			OrgAuditorIntent orgManagerIntent = dedupe(new OrgAuditorIntent(orgIntent, cfUserIntent));
+			// This is a bit dodgy - shouldn't we be adding two edges, one to org, one to user?
+			addVertexAndEdge(userOrgIntent, orgManagerIntent, dag);
+		}
+
 		for(Space space : declaration.org.spaces)
 		{
 			SpaceIntent spaceIntent = dedupe(new SpaceIntent(new NameProperty(space.name), orgIntent));

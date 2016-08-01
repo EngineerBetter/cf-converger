@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.engineerbetter.converger.facade.CfFacadeCfUserHandlerBuilder;
+import com.engineerbetter.converger.facade.CfFacadeOrgAuditorHandlerBuilder;
 import com.engineerbetter.converger.facade.CfFacadeOrgHandlerBuilder;
 import com.engineerbetter.converger.facade.CfFacadeOrgManagerHandlerBuilder;
 import com.engineerbetter.converger.facade.CfFacadeSpaceDeveloperHandlerBuilder;
@@ -16,6 +17,7 @@ import com.engineerbetter.converger.facade.UaaFacadeUaaUserHandlerBuilder;
 import com.engineerbetter.converger.intents.CfUserIntent;
 import com.engineerbetter.converger.intents.HandlerBuilder;
 import com.engineerbetter.converger.intents.HandlerFactory;
+import com.engineerbetter.converger.intents.OrgAuditorIntent;
 import com.engineerbetter.converger.intents.OrgIntent;
 import com.engineerbetter.converger.intents.OrgManagerIntent;
 import com.engineerbetter.converger.intents.SpaceDeveloperIntent;
@@ -38,6 +40,7 @@ public class HandlerConfig
 		handlerFactory.put(new TypeReference<HandlerBuilder<CfUserIntent>>() {}, new CfFacadeCfUserHandlerBuilder(cf));
 		handlerFactory.put(new TypeReference<HandlerBuilder<UaaUserIntent>>() {}, new UaaFacadeUaaUserHandlerBuilder(uaa));
 		handlerFactory.put(new TypeReference<HandlerBuilder<OrgManagerIntent>>() {}, new CfFacadeOrgManagerHandlerBuilder(cf));
+		handlerFactory.put(new TypeReference<HandlerBuilder<OrgAuditorIntent>>() {}, new CfFacadeOrgAuditorHandlerBuilder(cf));
 		handlerFactory.put(new TypeReference<HandlerBuilder<SpaceIntent>>() {}, new CfFacadeSpaceHandlerBuilder(cf));
 		handlerFactory.put(new TypeReference<HandlerBuilder<SpaceDeveloperIntent>>() {}, new CfFacadeSpaceDeveloperHandlerBuilder(cf));
 		handlerFactory.put(new TypeReference<HandlerBuilder<UpsIntent>>() {}, new CfFacadeUpsHandlerBuilder(cf));

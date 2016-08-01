@@ -11,6 +11,8 @@ org:
   name: my-lovely-org
   org_managers:
   - dan.young@example.com
+  org_auditors:
+  - dan.young@example.com
   spaces:
   - name: DEV
     user_provided_services:

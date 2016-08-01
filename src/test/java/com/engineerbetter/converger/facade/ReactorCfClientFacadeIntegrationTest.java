@@ -101,7 +101,7 @@ public class ReactorCfClientFacadeIntegrationTest
 
 
 	@Test
-	public void orgManagers()
+	public void orgRoles()
 	{
 		String userId = UUID.randomUUID().toString();
 		assertThat("user should not exist before test creates it", facade.userExists(userId), is(false));
@@ -109,8 +109,14 @@ public class ReactorCfClientFacadeIntegrationTest
 		assertThat("created user ID should exist in CF", facade.userExists(userId), is(true));
 		facade.addUserToOrg(userId, orgId);
 		assertThat("user should be in org", facade.isUserInOrg(userId, orgId), is(true));
+
 		facade.setOrgRole(userId, orgId, OrgRole.MANAGER);
 		assertThat("user should be org manager", facade.hasOrgRole(userId, orgId, OrgRole.MANAGER), is(true));
+
+		assertThat("user should not yet be org auditor", facade.hasOrgRole(userId, orgId, OrgRole.AUDITOR), is(false));
+		facade.setOrgRole(userId, orgId, OrgRole.AUDITOR);
+		assertThat("user should be org auditor", facade.hasOrgRole(userId, orgId, OrgRole.AUDITOR), is(true));
+
 		facade.deleteUser(userId);
 		assertThat("user should not exist after deletion", facade.userExists(userId), is(false));
 	}

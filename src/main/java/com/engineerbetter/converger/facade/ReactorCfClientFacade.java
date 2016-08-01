@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationUserRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
@@ -235,6 +236,14 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		if(role == OrgRole.MANAGER)
 		{
 			cf.organizations().associateManager(AssociateOrganizationManagerRequest.builder().organizationId(orgId).managerId(userId).build()).block();
+		}
+		else if(role == OrgRole.AUDITOR)
+		{
+			cf.organizations().associateAuditor(AssociateOrganizationAuditorRequest.builder().organizationId(orgId).auditorId(userId).build()).block();
+		}
+		else
+		{
+			throw new RuntimeException("Unknown Org Role "+role);
 		}
 	}
 
