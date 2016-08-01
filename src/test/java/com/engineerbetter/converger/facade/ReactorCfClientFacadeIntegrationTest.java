@@ -50,11 +50,13 @@ public class ReactorCfClientFacadeIntegrationTest
 		orgId = facade.createOrg(orgName);
 	}
 
+
 	@After
 	public void teardown()
 	{
 		facade.deleteOrg(orgId);
 	}
+
 
 	@Test
 	public void spaceManagement()
@@ -66,6 +68,7 @@ public class ReactorCfClientFacadeIntegrationTest
 		facade.deleteSpace(id);
 		assertThat(cfClient.spaces().list(ListSpacesRequest.builder().organizationId(orgId).name("test-space").build()).block().getResources().size(), is(0));
 	}
+
 
 	@Test
 	public void upsManagement()
@@ -96,6 +99,7 @@ public class ReactorCfClientFacadeIntegrationTest
 		assertThat(cfClient.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name("test-ups").build()).block().getResources().size(), is(0));
 	}
 
+
 	@Test
 	public void orgManagers()
 	{
@@ -107,5 +111,7 @@ public class ReactorCfClientFacadeIntegrationTest
 		assertThat("user should be in org", facade.isUserInOrg(userId, orgId), is(true));
 		facade.setOrgRole(userId, orgId, OrgRole.MANAGER);
 		assertThat("user should be org manager", facade.hasOrgRole(userId, orgId, OrgRole.MANAGER), is(true));
+		facade.deleteUser(userId);
+		assertThat("user should not exist after deletion", facade.userExists(userId), is(false));
 	}
 }

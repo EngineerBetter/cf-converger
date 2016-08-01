@@ -22,4 +22,10 @@ public class ModifyingUserOps extends AbstractClientV2Operations
 	{
 		return post(request, Void.class, builder -> builder.pathSegment("v2", "users"));
 	}
+
+
+	public Mono<Void> delete(DeleteUserRequest request)
+	{
+		return delete(request, Void.class, builder -> builder.pathSegment("v2", "users", request.guid));
+	}
 }

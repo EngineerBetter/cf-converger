@@ -45,6 +45,7 @@ import org.cloudfoundry.client.v2.users.UserResource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.engineerbetter.converger.facade.ops.CreateUserRequest;
+import com.engineerbetter.converger.facade.ops.DeleteUserRequest;
 import com.engineerbetter.converger.facade.ops.ModifyingUserOps;
 import com.engineerbetter.converger.properties.UpsProperties;
 
@@ -60,6 +61,7 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		this.createUserOps = createUserOps;
 	}
 
+
 	@Override
 	public Optional<String> findOrg(String name)
 	{
@@ -72,6 +74,7 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		return Optional.empty();
 	}
 
+
 	@Override
 	public String createOrg(String name)
 	{
@@ -79,11 +82,13 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		return response.getMetadata().getId();
 	}
 
+
 	@Override
 	public void deleteOrg(String id)
 	{
 		cf.organizations().delete(DeleteOrganizationRequest.builder().organizationId(id).recursive(true).build()).block();
 	}
+
 
 	@Override
 	public Optional<String> findSpace(String name, String orgId)
@@ -98,6 +103,7 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		return Optional.empty();
 	}
 
+
 	@Override
 	public String createSpace(String name, String orgId)
 	{
@@ -105,11 +111,13 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		return response.getMetadata().getId();
 	}
 
+
 	@Override
 	public void deleteSpace(String id)
 	{
 		cf.spaces().delete(DeleteSpaceRequest.builder().spaceId(id).build()).block();
 	}
+
 
 	@Override
 	public Optional<String> findUps(String name, String spaceId)
@@ -124,12 +132,14 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		return Optional.empty();
 	}
 
+
 	@Override
 	public String createUps(UpsProperties properties, String spaceId)
 	{
 		CreateUserProvidedServiceInstanceResponse response = cf.userProvidedServiceInstances().create(CreateUserProvidedServiceInstanceRequest.builder().name(properties.name).credentials(properties.credentials).spaceId(spaceId).build()).block();
 		return response.getMetadata().getId();
 	}
+
 
 	@Override
 	public UpsProperties getUps(String id)
@@ -139,6 +149,7 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 		Map<String, Object> entityCredentials = entity.getCredentials();
 		return new UpsProperties(entity.getName(), entityCredentials.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toString())));
 	}
+
 
 	@Override
 	public void updateUps(UpsProperties properties, String spaceId)
@@ -152,6 +163,7 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 
 		cf.userProvidedServiceInstances().update(UpdateUserProvidedServiceInstanceRequest.builder().credentials(properties.credentials).userProvidedServiceInstanceId(id.get()).build()).block();
 	}
+
 
 	@Override
 	public void deleteUps(String id)
@@ -172,6 +184,13 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	public void createUser(String id)
 	{
 		createUserOps.create(new CreateUserRequest(id)).block();
+	}
+
+
+	@Override
+	public void deleteUser(String id)
+	{
+		createUserOps.delete(new DeleteUserRequest(id, false)).block();
 	}
 
 
