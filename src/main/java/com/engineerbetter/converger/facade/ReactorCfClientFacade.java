@@ -43,7 +43,6 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import com.engineerbetter.converger.facade.ops.CreateUserRequest;
 import com.engineerbetter.converger.facade.ops.DeleteUserRequest;
@@ -294,11 +293,4 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 			throw new RuntimeException("Unknown Space Role "+role);
 		}
 	}
-
-	Mono<CloudFoundryClient> getCloudFoundryClientPublisher() {
-		return Optional.ofNullable(cf)
-				.map(Mono::just)
-				.orElse(Mono.error(new IllegalStateException("CloudFoundryClient must be set")));
-	}
-
 }
