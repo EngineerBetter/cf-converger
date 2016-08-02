@@ -32,6 +32,7 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 	private final HandlerFactory handlerFactory;
 	private final Map<Intent<? extends Resolution>, Intent<? extends Resolution>> intents;
 
+
 	@Autowired
 	public HardcodedOrderedHandlerBuilder(HandlerFactory handlerFactory)
 	{
@@ -54,6 +55,7 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 		}
 	}
 
+
 	private DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> buildGraph(Declaration declaration) throws CycleFoundException
 	{
 		DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag = new DirectedAcyclicGraph<>(DefaultEdge.class);
@@ -72,36 +74,12 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 			uaaUserIntents.put(user.email, uaaUserIntent);
 		}
 
-
 		OrgIntent orgIntent = dedupe(new OrgIntent(new NameProperty(declaration.org.name)));
 		Handler<OrgIntent> orgHandler = handlerFactory.build(orgIntent);
 		dag.addVertex(orgHandler);
 
-		for(String manager : declaration.org.managers)
-		{
-			UaaUserIntent uaaUserIntent = uaaUserIntents.get(manager);
-			addVertex(uaaUserIntent, dag);
-			CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
-			addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);
-			UserOrgIntent userOrgIntent = dedupe(new UserOrgIntent(orgIntent, cfUserIntent));
-			addVertexAndEdge(cfUserIntent, userOrgIntent, dag);
-			OrgManagerIntent orgManagerIntent = dedupe(new OrgManagerIntent(orgIntent, cfUserIntent));
-			// This is a bit dodgy - shouldn't we be adding two edges, one to org, one to user?
-			addVertexAndEdge(userOrgIntent, orgManagerIntent, dag);
-		}
-
-		for(String auditor : declaration.org.auditors)
-		{
-			UaaUserIntent uaaUserIntent = uaaUserIntents.get(auditor);
-			addVertex(uaaUserIntent, dag);
-			CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
-			addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);
-			UserOrgIntent userOrgIntent = dedupe(new UserOrgIntent(orgIntent, cfUserIntent));
-			addVertexAndEdge(cfUserIntent, userOrgIntent, dag);
-			OrgAuditorIntent orgManagerIntent = dedupe(new OrgAuditorIntent(orgIntent, cfUserIntent));
-			// This is a bit dodgy - shouldn't we be adding two edges, one to org, one to user?
-			addVertexAndEdge(userOrgIntent, orgManagerIntent, dag);
-		}
+		declaration.org.managers.stream().forEach(email -> addOrgRoleIntent(email, orgIntent, uaaUserIntents, dag, OrgManagerIntent::new));
+		declaration.org.auditors.stream().forEach(email -> addOrgRoleIntent(email, orgIntent, uaaUserIntents, dag, OrgAuditorIntent::new));
 
 		for(Space space : declaration.org.spaces)
 		{
@@ -122,11 +100,13 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 		return dag;
 	}
 
+
 	private <I extends Intent<? extends Resolution>> void addVertex(I toIntent, DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag)
 	{
 		toIntent = dedupe(toIntent);
 		dag.addVertex(handlerFactory.build(toIntent));
 	}
+
 
 	private void addVertexAndEdge(Intent<? extends Resolution> fromIntent,
 			Intent<? extends Resolution> toIntent,
@@ -144,6 +124,7 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 			throw new RuntimeException("Cycle found building allegedly acyclical graph", e);
 		}
 	}
+
 
 	private List<Handler<? extends Intent<? extends Resolution>>> orderDag(DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag)
 	{
@@ -181,9 +162,22 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 	}
 
 
-	private void addSpaceRoleIntent(String manager, OrgIntent orgIntent, SpaceIntent spaceIntent, Map<String, UaaUserIntent> uaaUserIntents, DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag, BiFunction<SpaceIntent, CfUserIntent, ? extends Intent<RelationshipResolution>> constructorFunction)
+	private void addOrgRoleIntent(String email, OrgIntent orgIntent, Map<String, UaaUserIntent> uaaUserIntents, DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag, BiFunction<OrgIntent, CfUserIntent, ? extends Intent<RelationshipResolution>> constructorFunction)
 	{
-		UaaUserIntent uaaUserIntent = uaaUserIntents.get(manager);
+		UaaUserIntent uaaUserIntent = uaaUserIntents.get(email);
+		addVertex(uaaUserIntent, dag);
+		CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
+		addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);
+		UserOrgIntent userOrgIntent = dedupe(new UserOrgIntent(orgIntent, cfUserIntent));
+		addVertexAndEdge(cfUserIntent, userOrgIntent, dag);
+		Intent<RelationshipResolution> orgManagerIntent = dedupe(constructorFunction.apply(orgIntent, cfUserIntent));
+		addVertexAndEdge(userOrgIntent, orgManagerIntent, dag);
+	}
+
+
+	private void addSpaceRoleIntent(String email, OrgIntent orgIntent, SpaceIntent spaceIntent, Map<String, UaaUserIntent> uaaUserIntents, DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag, BiFunction<SpaceIntent, CfUserIntent, ? extends Intent<RelationshipResolution>> constructorFunction)
+	{
+		UaaUserIntent uaaUserIntent = uaaUserIntents.get(email);
 		addVertex(uaaUserIntent, dag);
 		CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
 		addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);
