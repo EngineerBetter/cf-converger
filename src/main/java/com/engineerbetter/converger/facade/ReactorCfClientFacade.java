@@ -17,7 +17,6 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsResponse
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
 import org.cloudfoundry.client.v2.spaces.AssociateSpaceAuditorRequest;
@@ -212,8 +211,8 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public boolean isUserInOrg(String userId, String orgId)
 	{
-		ListOrganizationUsersResponse response = cf.organizations().listUsers(ListOrganizationUsersRequest.builder().organizationId(orgId).build()).block();
-		return response.getResources().stream().filter(u -> u.getMetadata().getId().equals(userId)).count() == 1L;
+		Flux<UserResource> users = PaginationUtils.requestClientV2Resources(page -> cf.organizations().listUsers(ListOrganizationUsersRequest.builder().organizationId(orgId).page(page).build()));
+		return users.any(u -> ResourceUtils.getId(u).equals(userId)).block();
 	}
 
 
