@@ -1,6 +1,5 @@
 package com.engineerbetter.converger.facade;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -13,9 +12,7 @@ import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v2.organizations.DeleteOrganizationRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationManagersResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationUsersRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsResponse;
@@ -26,11 +23,8 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v2.spaces.DeleteSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpaceAuditorsResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpaceDevelopersResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpaceManagersRequest;
-import org.cloudfoundry.client.v2.spaces.ListSpaceManagersResponse;
 import org.cloudfoundry.client.v2.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpacesResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
@@ -221,13 +215,13 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	{
 		if(role == OrgRole.MANAGER)
 		{
-			ListOrganizationManagersResponse response = cf.organizations().listManagers(ListOrganizationManagersRequest.builder().organizationId(orgId).build()).block();
-			return response.getResources().stream().filter(r -> r.getMetadata().getId().equals(userId)).count() == 1;
+			Flux<UserResource> users = PaginationUtils.requestClientV2Resources(page -> cf.organizations().listManagers(ListOrganizationManagersRequest.builder().organizationId(orgId).build()));
+			return users.any(u -> ResourceUtils.getId(u).equals(userId)).block();
 		}
 		else if(role == OrgRole.AUDITOR)
 		{
-			ListOrganizationAuditorsResponse response = cf.organizations().listAuditors(ListOrganizationAuditorsRequest.builder().organizationId(orgId).build()).block();
-			return response.getResources().stream().filter(r -> r.getMetadata().getId().equals(userId)).count() == 1;
+			Flux<UserResource> users = PaginationUtils.requestClientV2Resources(page -> cf.organizations().listAuditors(ListOrganizationAuditorsRequest.builder().organizationId(orgId).build()));
+			return users.any(u -> ResourceUtils.getId(u).equals(userId)).block();
 		}
 		else
 		{
@@ -257,28 +251,26 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public boolean hasSpaceRole(String userId, String spaceId, SpaceRole role)
 	{
-		List<UserResource> users;
+		Flux<UserResource> users;
 		if(role == SpaceRole.AUDITOR)
 		{
-			ListSpaceAuditorsResponse response = cf.spaces().listAuditors(ListSpaceAuditorsRequest.builder().spaceId(spaceId).build()).block();
-			users = response.getResources();
+			users = PaginationUtils.requestClientV2Resources(page -> cf.spaces().listAuditors(ListSpaceAuditorsRequest.builder().spaceId(spaceId).build()));
 		}
 		else if(role == SpaceRole.DEVELOPER)
 		{
-			ListSpaceDevelopersResponse response = cf.spaces().listDevelopers(ListSpaceDevelopersRequest.builder().spaceId(spaceId).build()).block();
-			users = response.getResources();
+			users = PaginationUtils.requestClientV2Resources(page -> cf.spaces().listDevelopers(ListSpaceDevelopersRequest.builder().spaceId(spaceId).build()));
+
 		}
 		else if(role == SpaceRole.MANAGER)
 		{
-			ListSpaceManagersResponse response = cf.spaces().listManagers(ListSpaceManagersRequest.builder().spaceId(spaceId).build()).block();
-			users = response.getResources();
+			users = PaginationUtils.requestClientV2Resources(page -> cf.spaces().listManagers(ListSpaceManagersRequest.builder().spaceId(spaceId).build()));
 		}
 		else
 		{
 			throw new RuntimeException("Unknown Space Role "+role);
 		}
 
-		return users.stream().filter(u -> u.getMetadata().getId().equals(userId)).count() == 1L;
+		return users.any(u -> ResourceUtils.getId(u).equals(userId)).block();
 	}
 
 
