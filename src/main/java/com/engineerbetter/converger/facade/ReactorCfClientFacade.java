@@ -46,6 +46,7 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServi
 import org.cloudfoundry.client.v2.users.ListUsersRequest;
 import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.util.PaginationUtils;
+import org.cloudfoundry.util.ResourceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import reactor.core.publisher.Flux;
@@ -183,7 +184,7 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	public boolean userExists(String id)
 	{
 		Flux<UserResource> allUsers = PaginationUtils.requestClientV2Resources(page -> cf.users().list(ListUsersRequest.builder().page(page).build()));
-		return allUsers.toStream().filter(u -> u.getMetadata().getId().equals(id)).count() == 1L;
+		return allUsers.any(u -> ResourceUtils.getId(u).equals(id)).block();
 	}
 
 
