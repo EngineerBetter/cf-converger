@@ -130,7 +130,7 @@ public class ReactorCfClientFacade implements CloudFoundryFacade
 	@Override
 	public Optional<String> findUps(String name, String spaceId)
 	{
-		ListUserProvidedServiceInstancesResponse response = cf.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().name(name).build()).block();
+		ListUserProvidedServiceInstancesResponse response = cf.userProvidedServiceInstances().list(ListUserProvidedServiceInstancesRequest.builder().spaceId(spaceId).name(name).build()).block();
 
 		if(response.getResources().size() > 0)
 		{
