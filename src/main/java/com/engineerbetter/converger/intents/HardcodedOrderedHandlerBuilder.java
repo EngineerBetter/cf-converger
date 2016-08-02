@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph;
 import org.jgrapht.experimental.dag.DirectedAcyclicGraph.CycleFoundException;
@@ -21,6 +22,7 @@ import com.engineerbetter.converger.model.Ups;
 import com.engineerbetter.converger.properties.NameProperty;
 import com.engineerbetter.converger.properties.UaaUserProperties;
 import com.engineerbetter.converger.properties.UpsProperties;
+import com.engineerbetter.converger.resolution.RelationshipResolution;
 import com.engineerbetter.converger.resolution.Resolution;
 
 @Service
@@ -106,53 +108,9 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 			SpaceIntent spaceIntent = dedupe(new SpaceIntent(new NameProperty(space.name), orgIntent));
 			addVertexAndEdge(orgIntent, spaceIntent, dag);
 
-			for(String auditor : space.auditors)
-			{
-				// Multiple returns would have made this easier to DRY out!
-				UaaUserIntent uaaUserIntent = uaaUserIntents.get(auditor);
-				addVertex(uaaUserIntent, dag);
-				CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
-				addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);
-				UserOrgIntent userOrgIntent = dedupe(new UserOrgIntent(orgIntent, cfUserIntent));
-				addVertexAndEdge(cfUserIntent, userOrgIntent, dag);
-
-				// This is pretty interesting. We depend on the datum of User and Space ID, but causally we depend on UserOrg
-				SpaceAuditorIntent spaceAuditorIntent = dedupe(new SpaceAuditorIntent(spaceIntent, cfUserIntent));
-				addVertexAndEdge(userOrgIntent, spaceAuditorIntent, dag);
-				addVertexAndEdge(spaceIntent, spaceAuditorIntent, dag);
-			}
-
-			for(String developer : space.developers)
-			{
-				// Multiple returns would have made this easier to DRY out!
-				UaaUserIntent uaaUserIntent = uaaUserIntents.get(developer);
-				addVertex(uaaUserIntent, dag);
-				CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
-				addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);
-				UserOrgIntent userOrgIntent = dedupe(new UserOrgIntent(orgIntent, cfUserIntent));
-				addVertexAndEdge(cfUserIntent, userOrgIntent, dag);
-
-				// This is pretty interesting. We depend on the datum of User and Space ID, but causally we depend on UserOrg
-				SpaceDeveloperIntent spaceDeveloperIntent = dedupe(new SpaceDeveloperIntent(spaceIntent, cfUserIntent));
-				addVertexAndEdge(userOrgIntent, spaceDeveloperIntent, dag);
-				addVertexAndEdge(spaceIntent, spaceDeveloperIntent, dag);
-			}
-
-			for(String manager : space.managers)
-			{
-				// Multiple returns would have made this easier to DRY out!
-				UaaUserIntent uaaUserIntent = uaaUserIntents.get(manager);
-				addVertex(uaaUserIntent, dag);
-				CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
-				addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);
-				UserOrgIntent userOrgIntent = dedupe(new UserOrgIntent(orgIntent, cfUserIntent));
-				addVertexAndEdge(cfUserIntent, userOrgIntent, dag);
-
-				// This is pretty interesting. We depend on the datum of User and Space ID, but causally we depend on UserOrg
-				SpaceManagerIntent spaceManagerIntent = dedupe(new SpaceManagerIntent(spaceIntent, cfUserIntent));
-				addVertexAndEdge(userOrgIntent, spaceManagerIntent, dag);
-				addVertexAndEdge(spaceIntent, spaceManagerIntent, dag);
-			}
+			space.auditors.stream().forEach(email -> addSpaceRoleIntent(email, orgIntent, spaceIntent, uaaUserIntents, dag, SpaceAuditorIntent::new));
+			space.developers.stream().forEach(email -> addSpaceRoleIntent(email, orgIntent, spaceIntent, uaaUserIntents, dag, SpaceDeveloperIntent::new));
+			space.managers.stream().forEach(email -> addSpaceRoleIntent(email, orgIntent, spaceIntent, uaaUserIntents, dag, SpaceManagerIntent::new));
 
 			for(Ups ups : space.upss)
 			{
@@ -164,7 +122,7 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 		return dag;
 	}
 
-	private <I extends Intent<? extends Resolution>> void addVertex(I toIntent, DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag) throws CycleFoundException
+	private <I extends Intent<? extends Resolution>> void addVertex(I toIntent, DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag)
 	{
 		toIntent = dedupe(toIntent);
 		dag.addVertex(handlerFactory.build(toIntent));
@@ -172,11 +130,19 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 
 	private void addVertexAndEdge(Intent<? extends Resolution> fromIntent,
 			Intent<? extends Resolution> toIntent,
-			DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag) throws CycleFoundException
+			DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag)
 	{
 		Handler<? extends Intent<? extends Resolution>> toHandler = handlerFactory.build(toIntent);
 		dag.addVertex(toHandler);
-		dag.addDagEdge(handlerFactory.build(fromIntent), toHandler);
+
+		try
+		{
+			dag.addDagEdge(handlerFactory.build(fromIntent), toHandler);
+		}
+		catch (CycleFoundException e)
+		{
+			throw new RuntimeException("Cycle found building allegedly acyclical graph", e);
+		}
 	}
 
 	private List<Handler<? extends Intent<? extends Resolution>>> orderDag(DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag)
@@ -212,5 +178,21 @@ public class HardcodedOrderedHandlerBuilder implements OrderedHandlerBuilder
 	{
 		intents.putIfAbsent(intent, intent);
 		return (I) intents.get(intent);
+	}
+
+
+	private void addSpaceRoleIntent(String manager, OrgIntent orgIntent, SpaceIntent spaceIntent, Map<String, UaaUserIntent> uaaUserIntents, DirectedAcyclicGraph<Handler<? extends Intent<? extends Resolution>>, DefaultEdge> dag, BiFunction<SpaceIntent, CfUserIntent, ? extends Intent<RelationshipResolution>> constructorFunction)
+	{
+		UaaUserIntent uaaUserIntent = uaaUserIntents.get(manager);
+		addVertex(uaaUserIntent, dag);
+		CfUserIntent cfUserIntent = dedupe(new CfUserIntent(uaaUserIntent));
+		addVertexAndEdge(uaaUserIntent, cfUserIntent, dag);
+		UserOrgIntent userOrgIntent = dedupe(new UserOrgIntent(orgIntent, cfUserIntent));
+		addVertexAndEdge(cfUserIntent, userOrgIntent, dag);
+
+		// We depend on the datum of User and Space ID, but causally we depend on UserOrg
+		Intent<RelationshipResolution> spaceManagerIntent = dedupe(constructorFunction.apply(spaceIntent, cfUserIntent));
+		addVertexAndEdge(userOrgIntent, spaceManagerIntent, dag);
+		addVertexAndEdge(spaceIntent, spaceManagerIntent, dag);
 	}
 }
