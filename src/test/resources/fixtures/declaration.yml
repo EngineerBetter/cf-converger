@@ -20,6 +20,8 @@ org:
       credentials:
         username: sa
         password: secret
+    space_auditors:
+    - daniel.jones@example.com
     space_developers:
     - daniel.jones@example.com
     space_managers:

@@ -110,6 +110,7 @@ public class UploadIntegrationTest {
 
 		Optional<String> djId = uaaFacade.findUser("daniel.jones@example.com");
 		assertThat("daniel.jones@example.com should exist in UAA", djId.isPresent(), is(true));
+		assertThat("daniel.jones@example.com should be DEV space manager", cfFacade.hasSpaceRole(djId.get(), devId.get(), SpaceRole.AUDITOR), is(true));
 		assertThat("daniel.jones@example.com should be DEV space developer", cfFacade.hasSpaceRole(djId.get(), devId.get(), SpaceRole.DEVELOPER), is(true));
 		assertThat("daniel.jones@example.com should be DEV space manager", cfFacade.hasSpaceRole(djId.get(), devId.get(), SpaceRole.MANAGER), is(true));
 
@@ -142,6 +143,7 @@ public class UploadIntegrationTest {
 		assertThat(response.getBody(), hasItem("Would set dan.young@example.com as manager of my-lovely-org"));
 		assertThat(response.getBody(), hasItem("Would set dan.young@example.com as auditor of my-lovely-org"));
 		assertThat(response.getBody(), hasItem(containsString("Would not create SpaceIntent [name=DEV")));
+		assertThat(response.getBody(), hasItem("Would set daniel.jones@example.com as auditor of DEV"));
 		assertThat(response.getBody(), hasItem("Would set daniel.jones@example.com as developer of DEV"));
 		assertThat(response.getBody(), hasItem("Would set daniel.jones@example.com as manager of DEV"));
 		assertThat(response.getBody(), hasItem(containsString("Would create SpaceIntent [name=PROD")));
