@@ -76,3 +76,13 @@ Integration tests rely on the availability of a Cloud Foundry instance.
 $ mvn clean test
 $ CF_HOST=https://api.bosh-lite.com CF_USERNAME=admin CF_PASSWORD=password mvn clean verify
 ```
+
+To test locally with [dnsmasq providing local DNS](https://docs.pivotal.io/pcf-dev/work-offline.html):
+
+```
+$ CF_HOST=api.local.pcfdev.io \
+  CF_USERNAME=admin \
+  CF_PASSWORD=admin \
+  mvn clean verify \
+  -DargLine="-Dsun.net.spi.nameservice.nameservers=127.0.0.1 -Dsun.net.spi.nameservice.provider.1=dns,sun"
+```
